@@ -1,7 +1,13 @@
 [package]
 name = "surface"
 version = "0.1.0"
-authors = ["qzed <qzed@users.noreply.github.com>"]
+authors = ["Maximilian Luz <luzmaximilian@gmail.com>"]
+description = "Control various aspects of Microsoft Surface devices on Linux from the Command-Line"
+
+repository = "https://github.com/qzed/surface-control"
+readme = "README.md"
+license = "MIT"
+
 edition = "2018"
 
 [dependencies]

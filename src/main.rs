@@ -46,9 +46,9 @@ fn app() -> clap::App<'static, 'static> {
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .subcommand(dgpu_power);
 
-    App::new("surfacectl")
+    App::new(clap::crate_name!())
         .version(clap::crate_version!())
-        .author("Maximilian Luz <luzmaximilian@gmail.com>")
+        .author(clap::crate_authors!("\n"))
         .about("Control various aspects of Microsoft Surface devices")
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .global_settings(&settings)
