@@ -9,8 +9,13 @@ readme = "README.md"
 license = "MIT"
 
 edition = "2018"
+build = "build.rs"
 
 [dependencies]
 clap = "2.33.0"
 indoc = "0.3.1"
 nix = "0.13.0"
+
+[build-dependencies]
+clap = "2.33.0"
+indoc = "0.3.1"
