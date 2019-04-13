@@ -19,3 +19,19 @@ nix = "0.13.0"
 [build-dependencies]
 clap = "2.33.0"
 indoc = "0.3.1"
+
+[package.metadata.deb]
+maintainer = "Maximilian Luz <luzmaximilian@gmail.com>"
+license-file = ["LICENSE", "0"]
+extended-description = """\
+Control various aspects of Microsoft Surface devices, such as
+performance-modes and dGPU power, from the Command Line."""
+depends = "$auto"
+section = "utility"
+priority = "optional"
+assets = [
+    ["target/release/surface", "usr/bin/", "755"],
+    ["target/surface.bash", "usr/share/bash-completion/completions/surface", "644"],
+    ["target/_surface", "usr/share/zsh/vendor-completions/_surface", "644"],
+    ["target/surface.fish", "usr/share/fish/completions/surface.fish", "644"],
+]
