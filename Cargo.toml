@@ -12,3 +12,4 @@ edition = "2018"
 
 [dependencies]
 clap = "2.33.0"
+indoc = "0.3.1"

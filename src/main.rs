@@ -1,5 +1,6 @@
 use std::io::Result;
 use clap;
+use indoc::indoc;
 
 mod dgpu;
 mod perf;
@@ -18,6 +19,18 @@ fn app() -> clap::App<'static, 'static> {
 
     let perf = SubCommand::with_name("performance")
         .about("Control or query the current performance-mode")
+        .long_about(indoc!("
+            Control or query the current performance-mode
+
+            Supported performance-mode values are:
+                
+                Value  Name
+                ---------------------------
+                    1  Normal (Default)
+                    2  Battery Saver
+                    3  Better Performance
+                    4  Best Performance
+            "))
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .subcommand(SubCommand::with_name("set")
             .about("Set the current performance-mode")
@@ -28,8 +41,13 @@ fn app() -> clap::App<'static, 'static> {
         .subcommand(SubCommand::with_name("get")
             .about("Get the current performance-mode"));
 
-    let dgpu_power = SubCommand::with_name("power")
+    let dgpu = SubCommand::with_name("dgpu")
         .about("Control or query the dGPU power state")
+        .long_about(indoc!("
+            Control or query the dGPU power state
+
+            Supported values are: 'on', 'off'.
+            "))
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .subcommand(SubCommand::with_name("set")
             .about("Set the current dGPU power state")
@@ -40,11 +58,6 @@ fn app() -> clap::App<'static, 'static> {
                 .index(1)))
         .subcommand(SubCommand::with_name("get")
             .about("Get the current dGPU power state"));
-
-    let dgpu = SubCommand::with_name("dgpu")
-        .about("Control the dGPU")
-        .setting(AppSettings::SubcommandRequiredElseHelp)
-        .subcommand(dgpu_power);
 
     App::new(clap::crate_name!())
         .version(clap::crate_version!())
@@ -87,27 +100,20 @@ fn cmd_status(_: &clap::ArgMatches) -> Result<()> {
 
 fn cmd_dgpu(m: &clap::ArgMatches) -> Result<()> {
     match m.subcommand() {
-        ("power", Some(m)) => cmd_dgpu_power(m),
-        _                  => unreachable!(),
-    }
-}
-
-fn cmd_dgpu_power(m: &clap::ArgMatches) -> Result<()> {
-    match m.subcommand() {
-        ("set", Some(m)) => cmd_dgpu_power_set(m),
-        ("get", Some(m)) => cmd_dgpu_power_get(m),
+        ("set", Some(m)) => cmd_dgpu_set(m),
+        ("get", Some(m)) => cmd_dgpu_get(m),
         _                => unreachable!(),
     }
 }
 
-fn cmd_dgpu_power_set(m: &clap::ArgMatches) -> Result<()> {
+fn cmd_dgpu_set(m: &clap::ArgMatches) -> Result<()> {
     use clap::value_t_or_exit;
     let state = value_t_or_exit!(m, "state", dgpu::PowerState);
 
     dgpu::Device::open()?.set_power(state)
 }
 
-fn cmd_dgpu_power_get(_: &clap::ArgMatches) -> Result<()> {
+fn cmd_dgpu_get(_: &clap::ArgMatches) -> Result<()> {
     println!("{}", dgpu::Device::open()?.get_power()?);
     Ok(())
 }
