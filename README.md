@@ -10,7 +10,7 @@ Completion files are automatically generated and can be found in the correspondi
 
 ### Arch Linux
 
-You can generate a package using the provided PKGBUILD in the `pkg/arch` directory.
+You can generate a package using the provided PKGBUILD in the `pkg/arch` directory and install it using `makepkg -si`.
 
 ### Debian
 
