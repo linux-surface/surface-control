@@ -1,5 +1,5 @@
 [package]
-name = "surfacectl"
+name = "surface"
 version = "0.1.0"
 authors = ["qzed <qzed@users.noreply.github.com>"]
 edition = "2018"
