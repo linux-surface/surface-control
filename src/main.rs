@@ -13,6 +13,9 @@ fn app() -> clap::App<'static, 'static> {
         AppSettings::VersionlessSubcommands,
     ];
 
+    let status = SubCommand::with_name("status")
+        .about("Query the current system status");
+
     let perf = SubCommand::with_name("performance")
         .about("Control or query the current performance-mode")
         .setting(AppSettings::SubcommandRequiredElseHelp)
@@ -49,6 +52,7 @@ fn app() -> clap::App<'static, 'static> {
         .about("Control various aspects of Microsoft Surface devices")
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .global_settings(&settings)
+        .subcommand(status)
         .subcommand(perf)
         .subcommand(dgpu)
 }
@@ -57,6 +61,7 @@ fn main() {
     let matches = app().get_matches();
 
     let result = match matches.subcommand() {
+        ("status",      Some(m)) => cmd_status(m),
         ("dgpu",        Some(m)) => cmd_dgpu(m),
         ("performance", Some(m)) => cmd_perf(m),
         _                        => unreachable!(),
@@ -65,6 +70,18 @@ fn main() {
     if let Err(e) = result {
         eprintln!("Error: {}", e);
     }
+}
+
+
+fn cmd_status(_: &clap::ArgMatches) -> Result<()> {
+    let dgpu_power = dgpu::Device::open()?.get_power()?;
+    let perf_mode  = perf::Device::open()?.get_mode()?;
+
+    println!("System Status:");
+    println!("  Performance-Mode: {}", perf_mode);
+    println!("  dGPU-Power:       {}", dgpu_power);
+
+    Ok(())
 }
 
 
