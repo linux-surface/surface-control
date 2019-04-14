@@ -51,10 +51,17 @@ fn cmd_dgpu_set(m: &clap::ArgMatches) -> Result<()> {
     use clap::value_t_or_exit;
     let state = value_t_or_exit!(m, "state", sys::dgpu::PowerState);
 
-    sys::dgpu::Device::open()?.set_power(state)?;
+    let dev = sys::dgpu::Device::open()?;
 
-    if !m.is_present("quiet") {
-        println!("dGPU power set to '{}'", state);
+    if state != dev.get_power()? {
+        dev.set_power(state)?;
+
+        if !m.is_present("quiet") {
+            println!("dGPU power set to '{}'", state);
+        }
+
+    } else if !m.is_present("quiet") {
+        println!("dGPU power already set to '{}', not changing", state);
     }
 
     Ok(())
@@ -85,10 +92,17 @@ fn cmd_perf_set(m: &clap::ArgMatches) -> Result<()> {
     use clap::value_t_or_exit;
     let mode = value_t_or_exit!(m, "mode", sys::perf::Mode);
 
-    sys::perf::Device::open()?.set_mode(mode)?;
+    let dev = sys::perf::Device::open()?;
 
-    if !m.is_present("quiet") {
-        println!("Performance-mode set to '{}'", mode);
+    if mode != dev.get_mode()? {
+        dev.set_mode(mode)?;
+
+        if !m.is_present("quiet") {
+            println!("Performance-mode set to '{}'", mode);
+        }
+
+    } else if !m.is_present("quiet") {
+        println!("Performance-mode already set to '{}', not changing", mode);
     }
 
     Ok(())

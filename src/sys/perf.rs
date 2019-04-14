@@ -5,7 +5,7 @@ use std::io::{Read, Write};
 use crate::error::{Error, ErrorKind, Result, ResultExt};
 
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Mode {
     Normal,
     Battery,
