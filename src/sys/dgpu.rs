@@ -1,6 +1,8 @@
 use std::fs::OpenOptions;
 use std::path::{Path, PathBuf};
-use std::io::{Result, Error, ErrorKind, Read, Write};
+use std::io::{Read, Write};
+
+use crate::error::{Error, ErrorKind, Result, ResultExt};
 
 
 #[derive(Debug, Copy, Clone)]
@@ -32,12 +34,15 @@ impl std::fmt::Display for PowerState {
     }
 }
 
+
+#[derive(Debug)]
+pub struct InvalidPowerStateError;
+
 impl std::str::FromStr for PowerState {
-    type Err = String;
+    type Err = InvalidPowerStateError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        PowerState::from_str(s)
-            .ok_or(format!("invalid power state: '{}'", s))
+        PowerState::from_str(s).ok_or(InvalidPowerStateError)
     }
 }
 
@@ -55,7 +60,9 @@ impl Device {
         if path.as_ref().is_dir() {
             Ok(Device { path: path.as_ref().to_owned() })
         } else {
-            Err(Error::new(ErrorKind::NotFound, "No Surface dGPU device found"))
+            Err(failure::err_msg("Surface dGPU hot-plug device not found"))
+                .context(ErrorKind::DeviceAccess)
+                .map_err(|e| e.into())
         }
     }
 
@@ -64,19 +71,19 @@ impl Device {
 
         let mut file = OpenOptions::new()
             .read(true)
-            .open(self.path.as_path().join("dgpu_power"))?;
+            .open(self.path.as_path().join("dgpu_power"))
+            .context(ErrorKind::DeviceAccess)?;
 
         let mut buf = [0; 4];
-        let len = file.read(&mut buf)?;
+        let len = file.read(&mut buf).context(ErrorKind::Io)?;
 
         let state = CStr::from_bytes_with_nul(&buf[0..len+1])
-            .map_err(|_| Error::new(ErrorKind::InvalidData, "Device returned invalid data"))?
-            .to_str()
-            .map_err(|_| Error::new(ErrorKind::InvalidData, "Device returned invalid data"))?
+            .context(ErrorKind::InvalidData)?
+            .to_str().context(ErrorKind::InvalidData)?
             .trim();
 
         PowerState::from_str(state)
-            .ok_or_else(|| Error::new(ErrorKind::InvalidData, "Device returned invalid data"))
+            .ok_or_else(|| Error::from(ErrorKind::InvalidData))
     }
 
     pub fn set_power(&self, state: PowerState) -> Result<()> {
@@ -84,14 +91,15 @@ impl Device {
 
         let mut file = OpenOptions::new()
             .write(true)
-            .open(self.path.as_path().join("dgpu_power"))?;
+            .open(self.path.as_path().join("dgpu_power"))
+            .context(ErrorKind::DeviceAccess)?;
 
-        let len = file.write(state)?;
+        let len = file.write(state).context(ErrorKind::Io)?;
 
         if len == state.len() {
             Ok(())
         } else {
-            Err(Error::new(ErrorKind::Other, "Failed to write to device"))
+            Err(Error::from(ErrorKind::Io))
         }
     }
 }

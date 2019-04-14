@@ -1,6 +1,8 @@
 use std::fs::OpenOptions;
 use std::path::{Path, PathBuf};
-use std::io::{Result, Error, ErrorKind, Read, Write};
+use std::io::{Read, Write};
+
+use crate::error::{Error, ErrorKind, Result, ResultExt};
 
 
 #[derive(Debug, Copy, Clone)]
@@ -40,12 +42,15 @@ impl std::fmt::Display for Mode {
     }
 }
 
+
+#[derive(Debug)]
+pub struct InvalidPerformanceModeError;
+
 impl std::str::FromStr for Mode {
-    type Err = String;
+    type Err = InvalidPerformanceModeError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        Mode::from_str(s)
-            .ok_or(format!("invalid performance mode: '{}'", s))
+        Mode::from_str(s).ok_or(InvalidPerformanceModeError)
     }
 }
 
@@ -63,7 +68,9 @@ impl Device {
         if path.as_ref().is_dir() {
             Ok(Device { path: path.as_ref().to_owned() })
         } else {
-            Err(Error::new(ErrorKind::NotFound, "No Surface performance-mode device found"))
+            Err(failure::err_msg("Surface performance-mode device not found"))
+                .context(ErrorKind::DeviceAccess)
+                .map_err(|e| e.into())
         }
     }
 
@@ -72,19 +79,19 @@ impl Device {
 
         let mut file = OpenOptions::new()
             .read(true)
-            .open(self.path.as_path().join("perf_mode"))?;
+            .open(self.path.as_path().join("perf_mode"))
+            .context(ErrorKind::DeviceAccess)?;
 
         let mut buf = [0; 4];
-        let len = file.read(&mut buf)?;
+        let len = file.read(&mut buf).context(ErrorKind::Io)?;
 
         let state = CStr::from_bytes_with_nul(&buf[0..len+1])
-            .map_err(|_| Error::new(ErrorKind::InvalidData, "Device returned invalid data"))?
-            .to_str()
-            .map_err(|_| Error::new(ErrorKind::InvalidData, "Device returned invalid data"))?
+            .context(ErrorKind::InvalidData)?
+            .to_str().context(ErrorKind::InvalidData)?
             .trim();
 
         Mode::from_str(state)
-            .ok_or_else(|| Error::new(ErrorKind::InvalidData, "Device returned invalid data"))
+            .ok_or_else(|| Error::from(ErrorKind::InvalidData))
     }
 
     pub fn set_mode(&self, mode: Mode) -> Result<()> {
@@ -92,14 +99,15 @@ impl Device {
 
         let mut file = OpenOptions::new()
             .write(true)
-            .open(self.path.as_path().join("perf_mode"))?;
+            .open(self.path.as_path().join("perf_mode"))
+            .context(ErrorKind::DeviceAccess)?;
 
-        let len = file.write(mode)?;
+        let len = file.write(mode).context(ErrorKind::Io)?;
 
         if len == mode.len() {
             Ok(())
         } else {
-            Err(Error::new(ErrorKind::Other, "Failed to write to device"))
+            Err(Error::from(ErrorKind::Io))
         }
     }
 }

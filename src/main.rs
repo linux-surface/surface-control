@@ -1,7 +1,8 @@
-use std::io::Result;
-
+mod error;
 mod cli;
 mod sys;
+
+use crate::error::Result;
 
 
 fn main() {
@@ -16,7 +17,11 @@ fn main() {
     };
 
     if let Err(e) = result {
-        eprintln!("Error: {}", e);
+        eprintln!("Error: {}.", e.kind());
+
+        for cause in e.iter_causes() {
+            eprintln!("       {}.", cause);
+        }
     }
 }
 

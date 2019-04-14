@@ -1,8 +1,6 @@
 use std::fs::File;
 use std::path::Path;
-use std::io::Result;
 use std::os::unix::io::AsRawFd;
-
 
 use nix::ioctl_none;
 use nix::ioctl_read;
@@ -10,6 +8,8 @@ use nix::request_code_read;
 use nix::request_code_none;
 use nix::convert_ioctl_res;
 use nix::ioc;
+
+use crate::error::{Error, ErrorKind, Result, ResultExt};
 
 
 #[derive(Debug)]
@@ -47,48 +47,50 @@ impl Device {
     }
 
     pub fn open_path<P: AsRef<Path>>(path: P) -> Result<Self> {
-        let file = File::open(path)?;
-        Ok(Device { file })
+        let result = File::open(path);
+
+        match result {
+            Ok(file) => Ok(Device { file }),
+            Err(ref e) if e.kind() == std::io::ErrorKind::NotFound => {
+                Err(failure::err_msg("Surface latch device not found"))
+                    .context(ErrorKind::DeviceAccess)
+                    .map_err(|e| e.into())
+            },
+            Err(e) => {
+                Err(e).context(ErrorKind::DeviceAccess)
+                    .map_err(|e| e.into())
+            },
+        }
+
     }
 
     pub fn latch_lock(&self) -> Result<()> {
-        unsafe {
-            dtx_latch_lock(self.file.as_raw_fd())
-                .map_err(|_| std::io::Error::last_os_error())?;
-        }
+        unsafe { dtx_latch_lock(self.file.as_raw_fd()).context(ErrorKind::Io)?; }
         Ok(())
     }
 
     pub fn latch_unlock(&self) -> Result<()> {
-        unsafe {
-            dtx_latch_unlock(self.file.as_raw_fd())
-                .map_err(|_| std::io::Error::last_os_error())?;
-        }
+        unsafe { dtx_latch_unlock(self.file.as_raw_fd()).context(ErrorKind::Io)?; }
         Ok(())
     }
 
     pub fn latch_request(&self) -> Result<()> {
-        unsafe {
-            dtx_latch_request(self.file.as_raw_fd())
-                .map_err(|_| std::io::Error::last_os_error())?;
-        }
+        unsafe { dtx_latch_request(self.file.as_raw_fd()).context(ErrorKind::Io)?; }
         Ok(())
     }
 
     pub fn get_opmode(&self) -> Result<OpMode> {
-        use std::io;
-
         let mut opmode: u32 = 0;
         unsafe {
             dtx_get_opmode(self.file.as_raw_fd(), &mut opmode as *mut u32)
-                .map_err(|_| std::io::Error::last_os_error())?;
+                .context(ErrorKind::Io)?;
         }
 
         match opmode {
             0 => Ok(OpMode::Tablet),
             1 => Ok(OpMode::Laptop),
             2 => Ok(OpMode::Studio),
-            _ => Err(io::Error::new(io::ErrorKind::InvalidData, "invalid opmode").into()),
+            _ => Err(Error::from(ErrorKind::InvalidData)),
         }
     }
 }
