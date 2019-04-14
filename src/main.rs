@@ -1,10 +1,7 @@
 use std::io::Result;
 
 mod cli;
-
-mod dgpu;
-mod perf;
-mod latch;
+mod sys;
 
 
 fn main() {
@@ -25,8 +22,8 @@ fn main() {
 
 
 fn cmd_status(_: &clap::ArgMatches) -> Result<()> {
-    let dgpu_power = dgpu::Device::open()?.get_power()?;
-    let perf_mode  = perf::Device::open()?.get_mode()?;
+    let dgpu_power = sys::dgpu::Device::open()?.get_power()?;
+    let perf_mode  = sys::perf::Device::open()?.get_mode()?;
 
     println!("System Status:");
     println!("  Performance-Mode: {}", perf_mode);
@@ -46,13 +43,13 @@ fn cmd_dgpu(m: &clap::ArgMatches) -> Result<()> {
 
 fn cmd_dgpu_set(m: &clap::ArgMatches) -> Result<()> {
     use clap::value_t_or_exit;
-    let state = value_t_or_exit!(m, "state", dgpu::PowerState);
+    let state = value_t_or_exit!(m, "state", sys::dgpu::PowerState);
 
-    dgpu::Device::open()?.set_power(state)
+    sys::dgpu::Device::open()?.set_power(state)
 }
 
 fn cmd_dgpu_get(_: &clap::ArgMatches) -> Result<()> {
-    println!("{}", dgpu::Device::open()?.get_power()?);
+    println!("{}", sys::dgpu::Device::open()?.get_power()?);
     Ok(())
 }
 
@@ -67,13 +64,13 @@ fn cmd_perf(m: &clap::ArgMatches) -> Result<()> {
 
 fn cmd_perf_set(m: &clap::ArgMatches) -> Result<()> {
     use clap::value_t_or_exit;
-    let state = value_t_or_exit!(m, "mode", perf::Mode);
+    let state = value_t_or_exit!(m, "mode", sys::perf::Mode);
 
-    perf::Device::open()?.set_mode(state)
+    sys::perf::Device::open()?.set_mode(state)
 }
 
 fn cmd_perf_get(_: &clap::ArgMatches) -> Result<()> {
-    println!("{}", perf::Device::open()?.get_mode()?);
+    println!("{}", sys::perf::Device::open()?.get_mode()?);
     Ok(())
 }
 
@@ -89,18 +86,18 @@ fn cmd_latch(m: &clap::ArgMatches) -> Result<()> {
 }
 
 fn cmd_latch_lock(_: &clap::ArgMatches) -> Result<()> {
-    latch::Device::open()?.latch_lock()
+    sys::latch::Device::open()?.latch_lock()
 }
 
 fn cmd_latch_unlock(_: &clap::ArgMatches) -> Result<()> {
-    latch::Device::open()?.latch_unlock()
+    sys::latch::Device::open()?.latch_unlock()
 }
 
 fn cmd_latch_request(_: &clap::ArgMatches) -> Result<()> {
-    latch::Device::open()?.latch_request()
+    sys::latch::Device::open()?.latch_request()
 }
 
 fn cmd_latch_get_opmode(_: &clap::ArgMatches) -> Result<()> {
-    println!("{}", latch::Device::open()?.get_opmode()?);
+    println!("{}", sys::latch::Device::open()?.get_opmode()?);
     Ok(())
 }
