@@ -22,10 +22,12 @@ fn main() {
 
 
 fn cmd_status(_: &clap::ArgMatches) -> Result<()> {
-    let dgpu_power = sys::dgpu::Device::open()?.get_power()?;
+    let opmode     = sys::latch::Device::open()?.get_opmode()?;
     let perf_mode  = sys::perf::Device::open()?.get_mode()?;
+    let dgpu_power = sys::dgpu::Device::open()?.get_power()?;
 
     println!("System Status:");
+    println!("  Device-Mode:      {}", opmode);
     println!("  Performance-Mode: {}", perf_mode);
     println!("  dGPU-Power:       {}", dgpu_power);
 
