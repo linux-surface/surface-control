@@ -7,10 +7,11 @@ Aims to provide a unified front-end to the various sysfs-attributes and special 
 
 ```
 USAGE:
-    surface <SUBCOMMAND>
+    surface [FLAGS] <SUBCOMMAND>
 
 FLAGS:
     -h, --help       Prints help information
+    -q, --quiet      Keep output quiet
     -V, --version    Prints version information
 
 SUBCOMMANDS:
