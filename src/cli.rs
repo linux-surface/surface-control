@@ -48,7 +48,7 @@ pub fn app() -> App<'static, 'static> {
             .about("Set the current dGPU power state")
             .arg(Arg::with_name("state")
                 .help("The power-state to be set")
-                .possible_values(&["on", "off", "1", "0"])
+                .possible_values(&["on", "off"])
                 .required(true)
                 .index(1)))
         .subcommand(SubCommand::with_name("get")
