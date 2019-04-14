@@ -22,9 +22,9 @@ pub enum OpMode {
 impl OpMode {
     pub fn as_str(&self) -> &'static str {
         match self {
-            OpMode::Tablet => "tablet",
-            OpMode::Laptop => "laptop",
-            OpMode::Studio => "studio",
+            OpMode::Tablet => "Tablet",
+            OpMode::Laptop => "Laptop",
+            OpMode::Studio => "Studio",
         }
     }
 }

@@ -26,7 +26,7 @@ impl Mode {
         }
     }
 
-    pub fn as_str(&self) -> &'static str {
+    pub fn short_str(&self) -> &'static str {
         match self {
             Mode::Normal  => "1",
             Mode::Battery => "2",
@@ -34,11 +34,20 @@ impl Mode {
             Mode::Perf2   => "4",
         }
     }
+
+    pub fn long_str(&self) -> &'static str {
+        match self {
+            Mode::Normal  => "Normal",
+            Mode::Battery => "Battery-Saver",
+            Mode::Perf1   => "Better Perormance",
+            Mode::Perf2   => "Best Performance",
+        }
+    }
 }
 
 impl std::fmt::Display for Mode {
     fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(fmt, "{}", self.as_str())
+        write!(fmt, "{}", self.long_str())
     }
 }
 
@@ -95,7 +104,7 @@ impl Device {
     }
 
     pub fn set_mode(&self, mode: Mode) -> Result<()> {
-        let mode = mode.as_str().as_bytes();
+        let mode = mode.short_str().as_bytes();
 
         let mut file = OpenOptions::new()
             .write(true)

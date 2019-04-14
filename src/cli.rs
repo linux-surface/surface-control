@@ -80,4 +80,9 @@ pub fn app() -> App<'static, 'static> {
         .subcommand(perf)
         .subcommand(dgpu)
         .subcommand(latch)
+        .arg(Arg::with_name("quiet")
+            .help("Keep output quiet")
+            .short("q")
+            .long("quiet")
+            .global(true))
 }
