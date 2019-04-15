@@ -2,27 +2,21 @@ mod error;
 mod cli;
 mod sys;
 
-use crate::error::{ErrorKind, Result, ResultExt};
+use crate::error::{ErrorKind, Result, ResultExt, CliResult};
 
 
-fn main() {
+fn main() -> CliResult {
     let matches = cli::app().get_matches();
 
-    let result = match matches.subcommand() {
-        ("status",      Some(m)) => cmd_status(m),
-        ("dgpu",        Some(m)) => cmd_dgpu(m),
-        ("performance", Some(m)) => cmd_perf(m),
-        ("latch",       Some(m)) => cmd_latch(m),
+    match matches.subcommand() {
+        ("status",      Some(m)) => cmd_status(m)?,
+        ("dgpu",        Some(m)) => cmd_dgpu(m)?,
+        ("performance", Some(m)) => cmd_perf(m)?,
+        ("latch",       Some(m)) => cmd_latch(m)?,
         _                        => unreachable!(),
-    };
-
-    if let Err(e) = result {
-        eprintln!("Error: {}.", e.kind());
-
-        for cause in e.iter_causes() {
-            eprintln!("       {}.", cause);
-        }
     }
+
+    Ok(())
 }
 
 

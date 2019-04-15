@@ -59,3 +59,27 @@ impl std::fmt::Display for Error {
         std::fmt::Display::fmt(&self.inner, f)
     }
 }
+
+
+pub type CliResult = std::result::Result<(), CliError>;
+
+pub struct CliError {
+    error: Error,
+}
+
+impl From<Error> for CliError {
+    fn from(error: Error) -> Self {
+        CliError { error }
+    }
+}
+
+impl std::fmt::Debug for CliError {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(fmt, "{}.", self.error.kind())?;
+        for cause in self.error.iter_causes() {
+            write!(fmt, "\n       {}.", cause)?;
+        }
+
+        Ok(())
+    }
+}
