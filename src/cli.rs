@@ -37,9 +37,9 @@ pub fn app() -> App<'static, 'static> {
             .about("Get the current performance-mode"));
 
     let dgpu = SubCommand::with_name("dgpu")
-        .about("Control or query the dGPU power state")
+        .about("Control or query the dGPU power state on the Surface Book 2")
         .long_about(indoc!("
-            Control or query the dGPU power state
+            Control or query the dGPU power state on the Surface Book 2
 
             Supported values are: 'on', 'off'.
             "))
