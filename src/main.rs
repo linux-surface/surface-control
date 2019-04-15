@@ -2,7 +2,7 @@ mod error;
 mod cli;
 mod sys;
 
-use crate::error::Result;
+use crate::error::{ErrorKind, Result, ResultExt};
 
 
 fn main() {
@@ -27,15 +27,47 @@ fn main() {
 
 
 fn cmd_status(_: &clap::ArgMatches) -> Result<()> {
-    let opmode     = sys::latch::Device::open()?.get_opmode()?;
-    let perf_mode  = sys::perf::Device::open()?.get_mode()?;
-    let dgpu_power = sys::dgpu::Device::open()?.get_power()?;
+    let mut found = false;
 
-    println!("       Device-Mode: {}", opmode);
-    println!("  Performance-Mode: {} ({})", perf_mode, perf_mode.short_str());
-    println!("        dGPU-Power: {}", dgpu_power);
+    let opmode = sys::latch::Device::open().and_then(|d| d.get_opmode());
+    let opmode = match opmode {
+        Ok(x) => { found = true; Some(x) },
+        Err(ref e) if e.kind() == ErrorKind::DeviceAccess => None,
+        Err(e) => return Err(e),
+    };
 
-    Ok(())
+    let perf_mode = sys::perf::Device::open().and_then(|d| d.get_mode());
+    let perf_mode = match perf_mode {
+        Ok(x) => { found = true; Some(x) },
+        Err(ref e) if e.kind() == ErrorKind::DeviceAccess => None,
+        Err(e) => return Err(e),
+    };
+
+    let dgpu_power = sys::dgpu::Device::open().and_then(|d| d.get_power());
+    let dgpu_power = match dgpu_power {
+        Ok(x) => { found = true; Some(x) },
+        Err(ref e) if e.kind() == ErrorKind::DeviceAccess => None,
+        Err(e) => return Err(e),
+    };
+
+    if found {
+        if let Some(opmode) = opmode {
+            println!("       Device-Mode: {}", opmode);
+        }
+        if let Some(perf_mode) = perf_mode {
+            println!("  Performance-Mode: {} ({})", perf_mode, perf_mode.short_str());
+        }
+        if let Some(dgpu_power) = dgpu_power {
+            println!("        dGPU-Power: {}", dgpu_power);
+        }
+
+        Ok(())
+
+    } else {
+        Err(failure::err_msg("No surface control device not found"))
+            .context(ErrorKind::DeviceAccess)
+            .map_err(|e| e.into())
+    }
 }
 
 
