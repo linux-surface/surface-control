@@ -17,6 +17,7 @@ sha256sums=(
 build(){
     cd "src"
     env CARGO_TARGET_DIR="target" CARGO_INCREMENTAL=0 cargo build --release --locked
+    strip --strip-all "target/release/surface"
 }
 
 package() {
