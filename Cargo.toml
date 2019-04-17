@@ -21,6 +21,10 @@ failure = "0.1.5"
 clap = "2.33.0"
 indoc = "0.3.1"
 
+[profile.release]
+lto = true
+codegen-units = 1
+
 
 [package.metadata.deb]
 maintainer = "Maximilian Luz <luzmaximilian@gmail.com>"
