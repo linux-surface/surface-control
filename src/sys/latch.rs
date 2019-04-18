@@ -54,11 +54,11 @@ impl Device {
             Err(ref e) if e.kind() == std::io::ErrorKind::NotFound => {
                 Err(failure::err_msg("Surface latch device not found"))
                     .context(ErrorKind::DeviceAccess)
-                    .map_err(|e| e.into())
+                    .map_err(Into::into)
             },
             Err(e) => {
                 Err(e).context(ErrorKind::DeviceAccess)
-                    .map_err(|e| e.into())
+                    .map_err(Into::into)
             },
         }
 

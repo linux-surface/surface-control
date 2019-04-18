@@ -60,7 +60,7 @@ fn cmd_status(_: &clap::ArgMatches) -> Result<()> {
     } else {
         Err(failure::err_msg("No surface control device not found"))
             .context(ErrorKind::DeviceAccess)
-            .map_err(|e| e.into())
+            .map_err(Into::into)
     }
 }
 

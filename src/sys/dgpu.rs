@@ -20,7 +20,7 @@ impl PowerState {
         }
     }
 
-    pub fn as_str(&self) -> &'static str {
+    pub fn as_str(self) -> &'static str {
         match self {
             PowerState::Off => "off",
             PowerState::On  => "on",
@@ -62,7 +62,7 @@ impl Device {
         } else {
             Err(failure::err_msg("Surface dGPU hot-plug device not found"))
                 .context(ErrorKind::DeviceAccess)
-                .map_err(|e| e.into())
+                .map_err(Into::into)
         }
     }
 
@@ -76,8 +76,9 @@ impl Device {
 
         let mut buf = [0; 4];
         let len = file.read(&mut buf).context(ErrorKind::Io)?;
+        let len = std::cmp::min(len + 1, buf.len());
 
-        let state = CStr::from_bytes_with_nul(&buf[0..len+1])
+        let state = CStr::from_bytes_with_nul(&buf[0..len])
             .context(ErrorKind::InvalidData)?
             .to_str().context(ErrorKind::InvalidData)?
             .trim();
