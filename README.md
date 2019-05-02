@@ -26,6 +26,11 @@ See `surface <subcommand> help` for more details.
 
 _Hint:_ You can specify the subcommand by any unabiguous prefix of it, i.e. `surface perf` and `surface p` will both evaluate to `surface performance`.
 
+## Installing
+
+Have a look at the [releases](https://github.com/qzed/linux-surface-control/releases) page.
+Pre-built packages are available for Debian (Ubuntu, ...) and Arch Linux (Manjaro, ...) based distributions.
+
 ## Building from Source
 
 Building this application from source follows the standard rust procedure, i.e. simply call `cargo build --release --locked` for a release-ready executable.
@@ -35,7 +40,7 @@ Completion files are automatically generated and can be found in the correspondi
 
 You can generate a package using the provided PKGBUILD in the `pkg/arch` directory and install it using `makepkg -si`.
 
-### Debian
+### Debian-based Distributions (Ubuntu, ...)
 
 Generating a Debian package can be done via [`cargo deb`](https://github.com/mmstick/cargo-deb).
 Specifically, you need to run
