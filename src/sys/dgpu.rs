@@ -74,7 +74,7 @@ impl Device {
             .open(self.path.as_path().join("dgpu_power"))
             .context(ErrorKind::DeviceAccess)?;
 
-        let mut buf = [0; 4];
+        let mut buf = [0; 5];
         let len = file.read(&mut buf).context(ErrorKind::Io)?;
         let len = std::cmp::min(len + 1, buf.len());
 
