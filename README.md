@@ -1,5 +1,10 @@
 # Linux Surface Control
 
+[![Build Status]][travis]
+
+[Build Status]: https://api.travis-ci.org/qzed/linux-surface-control.svg?branch=master
+[travis]: https://travis-ci.org/qzed/linux-surface-control
+
 Control various aspects of Microsoft Surface devices on Linux from the Command-Line.
 Aims to provide a unified front-end to the various sysfs-attributes and special devices.
 
