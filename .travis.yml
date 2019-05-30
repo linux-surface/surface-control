@@ -1,0 +1,59 @@
+language: rust
+
+rust:
+  - stable
+  - nightly
+
+addons:
+  apt:
+    packages:
+      - liblzma-dev
+
+cache:
+  cargo: true
+
+script:
+  - cargo build --all
+  - cargo test --all
+
+jobs:
+  allow_failures:
+    - rust: nightly-2019-04-17
+  include:
+    - stage: clippy lints
+      rust: nightly-2019-04-17
+      before_install:
+        - rustup component add clippy
+      script:
+        - cargo clippy --all -- -D warnings
+
+    - stage: release
+      if: tag IS present
+      script:
+        - "rm -f \"./target/debian/*.deb\""
+        - cargo install cargo-deb
+        - env CARGO_TARGET_DIR=target CARGO_INCREMENTAL=0 cargo deb
+      deploy:
+        provider: releases
+
+        file_glob: true
+        file: "./target/debian/*.deb"
+
+        api_key:
+          secure: oqadPMv+UVvrZ/33Bkgch8tc4cSqdaeMNesRm8lcNOGdLfEYhOFWu8kD9ZKSteLgA5KyWYmxKZxfjfqzRLYgPlkSOBb2Xgxhwm/MRZNU0DnqR6TSeyzcLWU9k6EQ5I8JoNferwKosy69MqoOmh0YNQT/lHoGviqsL1GTiiwBiSTUE5Jve73+vNqxbZZ+TnjvZrrSHP+clgbFR15WxR7yxMifZoqNFGLkloxFFKkB/RkArKh+it4SZNv05ZiyuP5AikvqTYlwct/efR8wcu1BOAUSzEPLAP2RFc+anJbnz5UKVH85MDv0Iyru6m35+xMAx6zkmSCBTa1Y8vkoe0OKD7s0tapcpXUyCzP2uMsQPBLssP1c+SkavwSotElLvSx6JZ9RvqyDKn/sMDngrtUf9zCa0ve4g+jlNG7ebQODLUAy1qTgYiELWObAk+eMt61sKmmNIg3teoBJ9YcxdLHCmKmykk+KJaPP0JsexT8m2gs05EScoAVrbs0ZZl8dfONUPHimuF2k1ikrfTtblmtwKxjGMbo9LDyJ++cz1InGvxzl6eK/KCnCO0DCawuWuL2sRtGvhYZgsWOLgaaT5lHnJFQu560xGbScE8swIe30wZ06NfW04zKgEqp5N9YU6eqMpwrY8CBXziDLwQGPvJ2w2kRzTPhxERX/jkWkA1p/Dy8=
+
+        skip_cleanup: true
+        draft: true
+        on:
+          tags: true
+
+branches:
+  only:
+    - master
+    - ci
+    - "/^v\\d.*/"
+    - "/^testing-ci\\.*/"
+
+notifications:
+  email:
+    on_success: never
