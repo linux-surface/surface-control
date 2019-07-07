@@ -11,20 +11,6 @@ license = "MIT"
 edition = "2018"
 build = "build.rs"
 
-[dependencies]
-clap = "2.33.0"
-indoc = "0.3.1"
-nix = "0.13.0"
-failure = "0.1.5"
-
-[build-dependencies]
-clap = "2.33.0"
-indoc = "0.3.1"
-
-[profile.release]
-lto = true
-codegen-units = 1
-
 
 [package.metadata.deb]
 maintainer = "Maximilian Luz <luzmaximilian@gmail.com>"
@@ -41,3 +27,17 @@ assets = [
     ["target/_surface", "usr/share/zsh/vendor-completions/_surface", "644"],
     ["target/surface.fish", "usr/share/fish/completions/surface.fish", "644"],
 ]
+
+[dependencies]
+clap = "2.33.0"
+indoc = "0.3.3"
+nix = "0.14.1"
+failure = "0.1.5"
+
+[build-dependencies]
+clap = "2.33.0"
+indoc = "0.3.3"
+
+[profile.release]
+lto = true
+codegen-units = 1

@@ -2,12 +2,7 @@ use std::fs::File;
 use std::path::Path;
 use std::os::unix::io::AsRawFd;
 
-use nix::ioctl_none;
-use nix::ioctl_read;
-use nix::request_code_read;
-use nix::request_code_none;
-use nix::convert_ioctl_res;
-use nix::ioc;
+use nix::{ioctl_none, ioctl_read};
 
 use crate::error::{Error, ErrorKind, Result, ResultExt};
 
