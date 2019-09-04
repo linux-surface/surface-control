@@ -30,13 +30,13 @@ assets = [
 
 [dependencies]
 clap = "2.33.0"
-indoc = "0.3.3"
-nix = "0.14.1"
+indoc = "0.3.4"
+nix = "0.15.0"
 failure = "0.1.5"
 
 [build-dependencies]
 clap = "2.33.0"
-indoc = "0.3.3"
+indoc = "0.3.4"
 
 [profile.release]
 lto = true
