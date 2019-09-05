@@ -1,5 +1,5 @@
 pkgname='surface-control'
-pkgver='0.2.2'
+pkgver='0.2.3'
 pkgrel='1'
 pkgdesc='Control various aspects of Microsoft Surface devices from the Command-Line'
 license=('MIT')
