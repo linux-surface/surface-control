@@ -31,13 +31,16 @@ jobs:
     - stage: release
       if: tag IS present
       script:
-        - rm -f "./pkg/deb/*.deb"
+        - rm -f "./pkg/deb/*.deb" "./pkg/bin/*.tar.xz"
         - ./pkg/deb/makedeb
+        - ./pkg/bin/makebin
       deploy:
         provider: releases
 
         file_glob: true
-        file: "./pkg/deb/*.deb"
+        file:
+          - "./pkg/deb/*.deb"
+          - "./pkg/bin/*.tar.xz"
 
         api_key:
           secure: oqadPMv+UVvrZ/33Bkgch8tc4cSqdaeMNesRm8lcNOGdLfEYhOFWu8kD9ZKSteLgA5KyWYmxKZxfjfqzRLYgPlkSOBb2Xgxhwm/MRZNU0DnqR6TSeyzcLWU9k6EQ5I8JoNferwKosy69MqoOmh0YNQT/lHoGviqsL1GTiiwBiSTUE5Jve73+vNqxbZZ+TnjvZrrSHP+clgbFR15WxR7yxMifZoqNFGLkloxFFKkB/RkArKh+it4SZNv05ZiyuP5AikvqTYlwct/efR8wcu1BOAUSzEPLAP2RFc+anJbnz5UKVH85MDv0Iyru6m35+xMAx6zkmSCBTa1Y8vkoe0OKD7s0tapcpXUyCzP2uMsQPBLssP1c+SkavwSotElLvSx6JZ9RvqyDKn/sMDngrtUf9zCa0ve4g+jlNG7ebQODLUAy1qTgYiELWObAk+eMt61sKmmNIg3teoBJ9YcxdLHCmKmykk+KJaPP0JsexT8m2gs05EScoAVrbs0ZZl8dfONUPHimuF2k1ikrfTtblmtwKxjGMbo9LDyJ++cz1InGvxzl6eK/KCnCO0DCawuWuL2sRtGvhYZgsWOLgaaT5lHnJFQu560xGbScE8swIe30wZ06NfW04zKgEqp5N9YU6eqMpwrY8CBXziDLwQGPvJ2w2kRzTPhxERX/jkWkA1p/Dy8=

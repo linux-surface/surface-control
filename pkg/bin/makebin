@@ -1,0 +1,79 @@
+#!/bin/bash
+set -e
+
+pkgname="surface-control"
+pkgarch="x86_64"
+
+gitver=$(git describe --tags 2> /dev/null | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g' || true)
+civer=$(echo $TRAVIS_TAG | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g')
+
+pkgver=${civer:-${gitver:-0.0.0}}
+binpkg="$pkgname-$pkgver-$pkgarch.bin.tar.xz"
+
+branch="HEAD"
+basepath="$PWD/pkg/bin"
+srcdir="$basepath/src"
+pkgdir="$basepath/pkg"
+
+
+pushd() {
+    command pushd "$@" > /dev/null
+}
+
+popd() {
+    command popd "$@" > /dev/null
+}
+
+
+chkdir() {
+    if [ ! -d ".git" ]
+    then
+        echo "Error: Script must be run from the root directory"
+        exit 1
+    fi
+}
+
+prepare() {
+    archive="$basepath/src.tar"
+
+    git archive --format tar "$branch" > "$archive"
+
+    mkdir -p "$srcdir"
+    tar xf "$archive" --directory "$srcdir"
+}
+
+build() {
+    pushd "$srcdir"
+	env CARGO_TARGET_DIR="$PWD/target" CARGO_INCREMENTAL=0 cargo build --release --locked
+    popd
+}
+
+package() {
+    pushd "$srcdir"
+
+    # clean package directory
+    rm -rf "$pkgdir"
+    mkdir -p "$pkgdir"
+
+    # copy binary files
+	install -D -m755 "target/release/surface" "$pkgdir/bin/surface"
+
+	# copy completion files
+	install -D -m644 "target/surface.bash" "$pkgdir/shell-completions/surface.bash"
+	install -D -m644 "target/_surface"     "$pkgdir/shell-completions/surface.zsh"
+	install -D -m644 "target/surface.fish" "$pkgdir/shell-completions/surface.fish"
+
+    # copy license
+	install -D -m644 "LICENSE" "$pkgdir/LICENSE"
+
+    # zip package
+    tar -C "$pkgdir" -cJf "$basepath/$binpkg" .
+
+    popd
+}
+
+
+chkdir
+prepare
+build
+package
