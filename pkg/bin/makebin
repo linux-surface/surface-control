@@ -45,6 +45,7 @@ prepare() {
 build() {
     pushd "$srcdir"
     env CARGO_TARGET_DIR="$PWD/target" CARGO_INCREMENTAL=0 cargo build --release --locked
+    strip --strip-all "target/release/surface"
     popd
 }
 
