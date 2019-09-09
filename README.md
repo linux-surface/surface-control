@@ -38,7 +38,7 @@ For this tool to work, you need a recent version of the [surface-acpi module][su
 ## Installing
 
 Have a look at the [releases](https://github.com/qzed/linux-surface-control/releases) page.
-Pre-built packages are available for Debian (Ubuntu, ...) and Arch Linux (Manjaro, ...) based distributions.
+Pre-built packages are available for Debian (Ubuntu, ...), whereas PKGBUILDs for Arch Linux are in the AUR (`surface-control`).
 
 ## Building from Source
 
@@ -47,7 +47,7 @@ Completion files are automatically generated and can be found in the correspondi
 
 ### Arch Linux
 
-You can generate a package using the provided PKGBUILD in the `pkg/arch` directory and install it using `makepkg -si`.
+Simply install `surface-control` from AUR or have a look at its PKGBUILD.
 
 ### Debian-based Distributions (Ubuntu, ...)
 
