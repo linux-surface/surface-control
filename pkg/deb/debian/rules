@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+export DH_VERBOSE = 1
+
+pkgdir = debian/surface-control
+
+clean:
+	dh clean
+	cargo clean
+
+build:
+	dh build
+	env CARGO_TARGET_DIR="${PWD}/target" CARGO_INCREMENTAL=0 cargo build --release --locked
+
+override_dh_install:
+	# binary files
+	install -D -m755 "target/release/surface" "${pkgdir}/usr/bin/surface"
+
+	# completion files
+	install -D -m644 "target/surface.bash" "${pkgdir}/usr/share/bash-completion/completions/surface"
+	install -D -m644 "target/_surface" "${pkgdir}/usr/share/zsh/vendor-completions/_surface"
+	install -D -m644 "target/surface.fish" "${pkgdir}/usr/share/fish/completions/surface.fish"
+
+%:
+	dh $@
