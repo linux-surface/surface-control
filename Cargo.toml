@@ -4,7 +4,7 @@ version = "0.2.5"
 authors = ["Maximilian Luz <luzmaximilian@gmail.com>"]
 description = "Control various aspects of Microsoft Surface devices on Linux from the Command-Line"
 
-repository = "https://github.com/qzed/surface-control"
+repository = "https://github.com/linux-surface/surface-control"
 readme = "README.md"
 license = "MIT"
 

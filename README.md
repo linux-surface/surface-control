@@ -2,8 +2,8 @@
 
 [![Build Status]][travis]
 
-[Build Status]: https://api.travis-ci.org/qzed/linux-surface-control.svg?branch=master
-[travis]: https://travis-ci.org/qzed/linux-surface-control
+[Build Status]: https://api.travis-ci.org/linux-surface/surface-control.svg?branch=master
+[travis]: https://travis-ci.org/linux-surface/surface-control
 
 Control various aspects of Microsoft Surface devices on Linux from the Command-Line.
 Aims to provide a unified front-end to the various sysfs-attributes and special devices.
@@ -33,11 +33,11 @@ _Hint:_ You can specify the subcommand by any unabiguous prefix of it, i.e. `sur
 
 ## Prequisites
 
-For this tool to work, you need a recent version of the [surface-acpi module][surface-acpi] e.g. via [Jake's kernel][surface-kernel] (for `latch` and `performance` sub-commands) and the [dGPU hot plug module][surface-shps] (for the `dgpu` sub-command).
+For this tool to work, you need a recent version of the [surface-sam module][surface-sam] e.g. via the [linux-surface kernel][surface-kernel].
 
 ## Installing
 
-Have a look at the [releases](https://github.com/qzed/linux-surface-control/releases) page.
+Have a look at the [releases](https://github.com/linux-surface/surface-control/releases) page.
 Pre-built packages are available for Debian (Ubuntu, ...), whereas PKGBUILDs for Arch Linux are in the AUR (`surface-control`).
 
 ## Building from Source
@@ -60,6 +60,5 @@ where setting `CARGO_TARGET_DIR` is required to output the generated auto-comple
 
 The final package can be found in `target/debian`.
 
-[surface-acpi]: https://github.com/qzed/linux-surfacegen5-acpi
-[surface-kernel]: https://github.com/jakeday/linux-surface
-[surface-shps]: https://github.com/qzed/linux-surfacebook2-mshw0153
+[surface-sam]: https://github.com/linux-surface/surface-aggregator-module
+[surface-kernel]: https://github.com/linux-surface/linux-surface
