@@ -3,7 +3,10 @@ name: CI
 on:
   push:
     branches:
+      - master
       - feature/ci
+
+  pull_request:
 
   create:
     tags:
@@ -61,7 +64,7 @@ jobs:
 
     - name: Build package
       run: ./pkg/bin/makebin
-    
+
     - name: Prepare release
       run: mkdir release && mv pkg/bin/*.tar.xz release
 
@@ -84,13 +87,13 @@ jobs:
 
     - name: Install rust
       run: rustup update stable && rustup default stable
-    
+
     - name: Install dependencies
       run: sudo apt-get install debhelper fakeroot
 
     - name: Build package
       run: ./pkg/deb/makedeb
-    
+
     - name: Prepare release
       run: mkdir release && mv pkg/deb/*.deb release
 
