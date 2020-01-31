@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - feature/ci
+
+jobs:
+  lint:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install rust
+      run: |
+        rustup update stable && rustup default stable
+        rustup component add clippy
+
+    - name: Run clippy
+      run: cargo clippy --all --all-features -- -Dwarnings
