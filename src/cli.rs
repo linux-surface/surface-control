@@ -72,7 +72,7 @@ pub fn app() -> App<'static, 'static> {
 
     App::new(clap::crate_name!())
         .version(clap::crate_version!())
-        .author(clap::crate_authors!("\n"))
+        .author("Maximilian Luz <luzmaximilian@gmail.com>")
         .about("Control various aspects of Microsoft Surface devices")
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .global_settings(&settings)
