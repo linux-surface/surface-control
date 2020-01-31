@@ -5,6 +5,9 @@ on:
     branches:
       - feature/ci
 
+  create:
+    tags:
+
 jobs:
   lint:
     name: Clippy
@@ -41,3 +44,58 @@ jobs:
 
     - name: Test
       run: cargo test --all
+
+  build-bin:
+    if: github.event_name == 'create' && github.event.ref_type == 'tag'
+
+    name: Build binary package
+    runs-on: ubuntu-16.04
+    needs: [lint, test]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install rust
+      run: rustup update stable && rustup default stable
+
+    - name: Build package
+      run: ./pkg/bin/makebin
+    
+    - name: Prepare release
+      run: mkdir release && mv pkg/bin/*.tar.xz release
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: binary-latest
+        path: release
+
+  build-deb:
+    if: github.event_name == 'create' && github.event.ref_type == 'tag'
+
+    name: Build deb package
+    runs-on: ubuntu-16.04
+    needs: [lint, test]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install rust
+      run: rustup update stable && rustup default stable
+    
+    - name: Install dependencies
+      run: sudo apt-get install debhelper fakeroot
+
+    - name: Build package
+      run: ./pkg/deb/makedeb
+    
+    - name: Prepare release
+      run: mkdir release && mv pkg/deb/*.deb release
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: debian-latest
+        path: release
