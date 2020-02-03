@@ -116,11 +116,54 @@ jobs:
         name: debian-latest
         path: release
 
+  build-f31:
+    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
+
+    name: Build Fedora 31 package
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    container: fedora:31
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install build dependencies
+      run: |
+        dnf distro-sync -y
+        dnf install -y rpmdevtools rpm-sign 'dnf-command(builddep)'
+        dnf builddep -y pkg/fedora/surface-control.spec
+
+    - name: Build package
+      run: |
+        cd pkg/fedora
+        # Build the .rpm packages
+        ./makerpm
+
+    - name: Sign packages
+      env:
+        GPG_KEY_ID: 56C464BAAC421453
+        GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
+      run: |
+        cd pkg/fedora/out/x86_64
+
+        # import GPG key
+        echo "$GPG_KEY" | base64 -d | gpg --import --no-tty --batch --yes
+
+        # sign package
+        rpm --resign *.rpm --define "_gpg_name $GPG_KEY_ID"
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: fedora-31-latest
+        path: pkg/fedora/out/x86_64
+
   release:
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
 
     name: Publish release
-    needs: [build-bin, build-deb]
+    needs: [build-bin, build-deb, build-f31]
     runs-on: ubuntu-latest
 
     steps:
@@ -133,6 +176,11 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: debian-latest
+
+    - name: Download Fedora 31 artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: fedora-31-latest
 
     - name: Upload assets
       uses: svenstaro/upload-release-action@v1-release
