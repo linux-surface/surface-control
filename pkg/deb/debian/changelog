@@ -1,3 +1,9 @@
+surface-control (0.2.5-2) unstable; urgency=medium
+
+  * Bump pkgrel
+
+ -- Maximilian Luz <luzmaximilian@gmail.com>  Tue, 18 Feb 2020 20:58:58 +0100
+
 surface-control (0.2.5) unstable; urgency=medium
 
   * Adapt to changes in linux-surface kernel: The device path for the performance-mode interface has changed.

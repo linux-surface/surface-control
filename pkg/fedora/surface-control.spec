@@ -1,6 +1,6 @@
 Name:       surface-control
 Version:    0.2.5
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    Control various aspects of Microsoft Surface devices from the shell
 
 License:    MIT
