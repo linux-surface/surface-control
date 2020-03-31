@@ -335,7 +335,7 @@ jobs:
         update_branch="${BRANCH_STAGING}-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
         git switch -c "${update_branch}"
         git add .
-        git commit -m "Update Debian secure-boot MOK"
+        git commit -m "Update Debian surface-control"
         git push --set-upstream origin "${update_branch}"
 
   repo-f32:
@@ -385,7 +385,7 @@ jobs:
         update_branch="${BRANCH_STAGING}-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
         git checkout -b "${update_branch}"
         git add .
-        git commit -m "Update Fedora 32 secure-boot MOK"
+        git commit -m "Update Fedora 32 surface-control"
         git push --set-upstream origin "${update_branch}"
 
   repo-f31:
@@ -435,7 +435,7 @@ jobs:
         update_branch="${BRANCH_STAGING}-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
         git checkout -b "${update_branch}"
         git add .
-        git commit -m "Update Fedora 31 secure-boot MOK"
+        git commit -m "Update Fedora 31 surface-control"
         git push --set-upstream origin "${update_branch}"
 
   repo-f30:
@@ -485,5 +485,5 @@ jobs:
         update_branch="${BRANCH_STAGING}-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
         git checkout -b "${update_branch}"
         git add .
-        git commit -m "Update Fedora 30 secure-boot MOK"
+        git commit -m "Update Fedora 30 surface-control"
         git push --set-upstream origin "${update_branch}"
