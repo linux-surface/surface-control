@@ -1,3 +1,9 @@
+surface-control (0.2.5-3) unstable; urgency=medium
+
+  * Bump pkgrel
+
+ -- Dorian Stoll <dorian.stoll@tmsp.io>  Tue, 31 Mar 2020 13:44:24 +0200
+
 surface-control (0.2.5-2) unstable; urgency=medium
 
   * Bump pkgrel

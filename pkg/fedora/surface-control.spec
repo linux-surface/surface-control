@@ -1,6 +1,6 @@
 Name:       surface-control
 Version:    0.2.5
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    Control various aspects of Microsoft Surface devices from the shell
 
 License:    MIT
@@ -42,6 +42,9 @@ install -D -m644 "surface-control/target/surface.fish" "%{buildroot}/usr/share/f
 /usr/share/fish/completions/surface.fish
 
 %changelog
+* Tue Mar 31 2020 Dorian Stoll <dorian.stoll@tmsp.io> 0.2.5-3
+- Bump pkgrel
+
 * Sun Dec 01 2019 Dorian Stoll <dorian.stoll@tmsp.io>
 - Update to version 0.2.5
 
