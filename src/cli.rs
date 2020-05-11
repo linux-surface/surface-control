@@ -1,10 +1,10 @@
-use clap;
 use clap::{App, AppSettings, Arg, SubCommand};
 use indoc::indoc;
 
 
 pub fn app() -> App<'static, 'static> {
     let settings = [
+        AppSettings::ColoredHelp,
         AppSettings::InferSubcommands,
         AppSettings::VersionlessSubcommands,
     ];
