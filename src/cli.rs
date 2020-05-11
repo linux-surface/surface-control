@@ -1,4 +1,3 @@
-use clap;
 use clap::{App, AppSettings, Arg, SubCommand};
 use indoc::indoc;
 
