@@ -39,7 +39,7 @@ impl Mode {
         match self {
             Mode::Normal  => "Normal",
             Mode::Battery => "Battery-Saver",
-            Mode::Perf1   => "Better Perormance",
+            Mode::Perf1   => "Better Performance",
             Mode::Perf2   => "Best Performance",
         }
     }
