@@ -12,14 +12,14 @@ edition = "2018"
 build = "build.rs"
 
 [dependencies]
-clap = "2.33.0"
-indoc = "0.3.4"
-nix = "0.16.1"
-failure = "0.1.6"
+clap = "2.33.1"
+indoc = "0.3.6"
+nix = "0.17.0"
+failure = "0.1.8"
 
 [build-dependencies]
-clap = "2.33.0"
-indoc = "0.3.4"
+clap = "2.33.1"
+indoc = "0.3.6"
 
 [profile.release]
 lto = true
