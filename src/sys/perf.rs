@@ -70,7 +70,7 @@ pub struct Device {
 
 impl Device {
     pub fn open() -> Result<Self> {
-        Device::open_path("/sys/bus/platform/devices/surface_sam_sid_perfmode")
+        Device::open_path("/sys/bus/ssam/devices/03:01:00:02")
     }
 
     pub fn open_path<P: AsRef<Path>>(path: P) -> Result<Self> {
