@@ -1,5 +1,5 @@
 Name:       surface-control
-Version:    0.2.6
+Version:    0.2.7
 Release:    1%{?dist}
 Summary:    Control various aspects of Microsoft Surface devices from the shell
 
