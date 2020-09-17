@@ -1,6 +1,6 @@
 [package]
 name = "surface"
-version = "0.2.7"
+version = "0.2.8"
 authors = ["Maximilian Luz <luzmaximilian@gmail.com>"]
 description = "Control various aspects of Microsoft Surface devices on Linux from the Command-Line"
 
