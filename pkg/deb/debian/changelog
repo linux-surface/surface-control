@@ -1,3 +1,9 @@
+surface-control (0.2.8-2) unstable; urgency=medium
+
+  * Bump release to build for Fedora 33
+
+ -- Dorian Stoll <dorian.stoll@tmsp.io>  Tue, 29 Sep 2020 18:43:42 +0200
+
 surface-control (0.2.8-1) unstable; urgency=medium
 
   * Adapt to changes in linux-surface kernel: The device path for the performance-mode interface has changed.
