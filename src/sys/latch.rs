@@ -38,7 +38,7 @@ pub struct Device {
 
 impl Device {
     pub fn open() -> Result<Self> {
-        Device::open_path("/dev/surface_dtx")
+        Device::open_path("/dev/surface/dtx")
     }
 
     pub fn open_path<P: AsRef<Path>>(path: P) -> Result<Self> {
