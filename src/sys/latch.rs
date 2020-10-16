@@ -75,9 +75,9 @@ impl Device {
     }
 
     pub fn get_opmode(&self) -> Result<OpMode> {
-        let mut opmode: u32 = 0;
+        let mut opmode: u16 = 0;
         unsafe {
-            dtx_get_opmode(self.file.as_raw_fd(), &mut opmode as *mut u32)
+            dtx_get_opmode(self.file.as_raw_fd(), &mut opmode as *mut u16)
                 .context(ErrorKind::Io)?;
         }
 
@@ -91,8 +91,7 @@ impl Device {
 }
 
 
-ioctl_none!(dtx_latch_lock,    0x11, 0x01);
-ioctl_none!(dtx_latch_unlock,  0x11, 0x02);
-ioctl_none!(dtx_latch_request, 0x11, 0x03);
-ioctl_none!(dtx_latch_open,    0x11, 0x04);
-ioctl_read!(dtx_get_opmode,    0x11, 0x05, u32);
+ioctl_none!(dtx_latch_lock,    0xa5, 0x23);
+ioctl_none!(dtx_latch_unlock,  0xa5, 0x24);
+ioctl_none!(dtx_latch_request, 0xa5, 0x25);
+ioctl_read!(dtx_get_opmode,    0xa5, 0x2a, u16);
