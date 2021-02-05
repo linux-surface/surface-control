@@ -57,15 +57,19 @@ package() {
     mkdir -p "$pkgdir"
 
     # copy binary files
-	install -D -m755 "target/release/surface" "$pkgdir/bin/surface"
+    install -D -m755 "target/release/surface" "$pkgdir/bin/surface"
 
-	# copy completion files
-	install -D -m644 "target/surface.bash" "$pkgdir/shell-completions/surface.bash"
-	install -D -m644 "target/_surface"     "$pkgdir/shell-completions/surface.zsh"
-	install -D -m644 "target/surface.fish" "$pkgdir/shell-completions/surface.fish"
+    # copy system files
+    install -D -m644 "etc/sysusers/surface-control.conf" "$pkgdir/usr/lib/sysusers.d/surface-control.conf"
+    install -D -m644 "etc/udev/40-surface-control.rules" "$pkgdir/usr/lib/udev/rules.d/40-surface-control.rules"
+
+    # copy completion files
+    install -D -m644 "target/surface.bash" "$pkgdir/shell-completions/surface.bash"
+    install -D -m644 "target/_surface"     "$pkgdir/shell-completions/surface.zsh"
+    install -D -m644 "target/surface.fish" "$pkgdir/shell-completions/surface.fish"
 
     # copy license
-	install -D -m644 "LICENSE" "$pkgdir/LICENSE"
+    install -D -m644 "LICENSE" "$pkgdir/LICENSE"
 
     # zip package
     tar -C "$pkgdir" -cJf "$basepath/$binpkg" .
