@@ -18,7 +18,7 @@ pub fn app() -> App<'static, 'static> {
             Control or query the current performance-mode
 
             Supported performance-mode values are:
-                
+
                 Value  Name
                 ---------------------------
                     1  Normal (Default)
