@@ -10,7 +10,6 @@ fn main() -> CliResult {
 
     match matches.subcommand() {
         ("status",      Some(m)) => cmd_status(m)?,
-        ("dgpu",        Some(m)) => cmd_dgpu(m)?,
         ("performance", Some(m)) => cmd_perf(m)?,
         ("latch",       Some(m)) => cmd_latch(m)?,
         _                        => unreachable!(),
@@ -37,22 +36,12 @@ fn cmd_status(_: &clap::ArgMatches) -> Result<()> {
         Err(e) => return Err(e),
     };
 
-    let dgpu_power = sys::dgpu::Device::open().and_then(|d| d.get_power());
-    let dgpu_power = match dgpu_power {
-        Ok(x) => { found = true; Some(x) },
-        Err(ref e) if e.kind() == ErrorKind::DeviceAccess => None,
-        Err(e) => return Err(e),
-    };
-
     if found {
         if let Some(opmode) = opmode {
             println!("       Device-Mode: {}", opmode);
         }
         if let Some(perf_mode) = perf_mode {
             println!("  Performance-Mode: {} ({})", perf_mode, perf_mode.short_str());
-        }
-        if let Some(dgpu_power) = dgpu_power {
-            println!("        dGPU-Power: {}", dgpu_power);
         }
 
         Ok(())
@@ -62,47 +51,6 @@ fn cmd_status(_: &clap::ArgMatches) -> Result<()> {
             .context(ErrorKind::DeviceAccess)
             .map_err(Into::into)
     }
-}
-
-
-fn cmd_dgpu(m: &clap::ArgMatches) -> Result<()> {
-    match m.subcommand() {
-        ("set", Some(m)) => cmd_dgpu_set(m),
-        ("get", Some(m)) => cmd_dgpu_get(m),
-        _                => unreachable!(),
-    }
-}
-
-fn cmd_dgpu_set(m: &clap::ArgMatches) -> Result<()> {
-    use clap::value_t_or_exit;
-    let state = value_t_or_exit!(m, "state", sys::dgpu::PowerState);
-
-    let dev = sys::dgpu::Device::open()?;
-
-    if state != dev.get_power()? {
-        dev.set_power(state)?;
-
-        if !m.is_present("quiet") {
-            println!("dGPU power set to '{}'", state);
-        }
-
-    } else if !m.is_present("quiet") {
-        println!("dGPU power already set to '{}', not changing", state);
-    }
-
-    Ok(())
-}
-
-fn cmd_dgpu_get(m: &clap::ArgMatches) -> Result<()> {
-    let state = sys::dgpu::Device::open()?.get_power()?;
-
-    if !m.is_present("quiet") {
-        println!("dGPU power is '{}'", state);
-    } else {
-        println!("{}", state);
-    }
-
-    Ok(())
 }
 
 

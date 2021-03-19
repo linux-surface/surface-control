@@ -36,24 +36,6 @@ pub fn app() -> App<'static, 'static> {
         .subcommand(SubCommand::with_name("get")
             .about("Get the current performance-mode"));
 
-    let dgpu = SubCommand::with_name("dgpu")
-        .about("Control or query the dGPU power state on the Surface Book 2")
-        .long_about(indoc!("
-            Control or query the dGPU power state on the Surface Book 2
-
-            Supported values are: 'on', 'off'.
-            "))
-        .setting(AppSettings::SubcommandRequiredElseHelp)
-        .subcommand(SubCommand::with_name("set")
-            .about("Set the current dGPU power state")
-            .arg(Arg::with_name("state")
-                .help("The power-state to be set")
-                .possible_values(&["on", "off"])
-                .required(true)
-                .index(1)))
-        .subcommand(SubCommand::with_name("get")
-            .about("Get the current dGPU power state"));
-
     let latch = SubCommand::with_name("latch")
         .about("Control the latch/dtx-system on the Surface Book 2")
         .setting(AppSettings::SubcommandRequiredElseHelp)
@@ -78,7 +60,6 @@ pub fn app() -> App<'static, 'static> {
         .global_settings(&settings)
         .subcommand(status)
         .subcommand(perf)
-        .subcommand(dgpu)
         .subcommand(latch)
         .arg(Arg::with_name("quiet")
             .help("Keep output quiet")
