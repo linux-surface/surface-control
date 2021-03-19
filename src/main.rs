@@ -11,7 +11,7 @@ fn main() -> CliResult {
     match matches.subcommand() {
         ("status",      Some(m)) => cmd_status(m)?,
         ("performance", Some(m)) => cmd_perf(m)?,
-        ("latch",       Some(m)) => cmd_latch(m)?,
+        ("dtx",         Some(m)) => cmd_dtx(m)?,
         _                        => unreachable!(),
     }
 
@@ -22,7 +22,7 @@ fn main() -> CliResult {
 fn cmd_status(_: &clap::ArgMatches) -> Result<()> {
     let mut found = false;
 
-    let opmode = sys::latch::Device::open().and_then(|d| d.get_opmode());
+    let opmode = sys::dtx::Device::open().and_then(|d| d.get_opmode());
     let opmode = match opmode {
         Ok(x) => { found = true; Some(x) },
         Err(ref e) if e.kind() == ErrorKind::DeviceAccess => None,
@@ -95,18 +95,18 @@ fn cmd_perf_get(m: &clap::ArgMatches) -> Result<()> {
 }
 
 
-fn cmd_latch(m: &clap::ArgMatches) -> Result<()> {
+fn cmd_dtx(m: &clap::ArgMatches) -> Result<()> {
     match m.subcommand() {
-        ("lock",       Some(m)) => cmd_latch_lock(m),
-        ("unlock",     Some(m)) => cmd_latch_unlock(m),
-        ("request",    Some(m)) => cmd_latch_request(m),
-        ("get-opmode", Some(m)) => cmd_latch_get_opmode(m),
+        ("lock",       Some(m)) => cmd_dtx_lock(m),
+        ("unlock",     Some(m)) => cmd_dtx_unlock(m),
+        ("request",    Some(m)) => cmd_dtx_request(m),
+        ("get-opmode", Some(m)) => cmd_dtx_get_opmode(m),
         _                       => unreachable!(),
     }
 }
 
-fn cmd_latch_lock(m: &clap::ArgMatches) -> Result<()> {
-    sys::latch::Device::open()?.latch_lock()?;
+fn cmd_dtx_lock(m: &clap::ArgMatches) -> Result<()> {
+    sys::dtx::Device::open()?.latch_lock()?;
 
     if !m.is_present("quiet") {
         println!("Clipboard latch locked");
@@ -115,8 +115,8 @@ fn cmd_latch_lock(m: &clap::ArgMatches) -> Result<()> {
     Ok(())
 }
 
-fn cmd_latch_unlock(m: &clap::ArgMatches) -> Result<()> {
-    sys::latch::Device::open()?.latch_unlock()?;
+fn cmd_dtx_unlock(m: &clap::ArgMatches) -> Result<()> {
+    sys::dtx::Device::open()?.latch_unlock()?;
 
     if !m.is_present("quiet") {
         println!("Clipboard latch unlocked");
@@ -125,8 +125,8 @@ fn cmd_latch_unlock(m: &clap::ArgMatches) -> Result<()> {
     Ok(())
 }
 
-fn cmd_latch_request(m: &clap::ArgMatches) -> Result<()> {
-    sys::latch::Device::open()?.latch_request()?;
+fn cmd_dtx_request(m: &clap::ArgMatches) -> Result<()> {
+    sys::dtx::Device::open()?.latch_request()?;
 
     if !m.is_present("quiet") {
         println!("Clipboard latch request executed");
@@ -135,8 +135,8 @@ fn cmd_latch_request(m: &clap::ArgMatches) -> Result<()> {
     Ok(())
 }
 
-fn cmd_latch_get_opmode(m: &clap::ArgMatches) -> Result<()> {
-    let opmode = sys::latch::Device::open()?.get_opmode()?;
+fn cmd_dtx_get_opmode(m: &clap::ArgMatches) -> Result<()> {
+    let opmode = sys::dtx::Device::open()?.get_opmode()?;
 
     if !m.is_present("quiet") {
         println!("Device is in '{}' mode", opmode);

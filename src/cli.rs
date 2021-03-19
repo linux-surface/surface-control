@@ -36,7 +36,7 @@ pub fn app() -> App<'static, 'static> {
         .subcommand(SubCommand::with_name("get")
             .about("Get the current performance-mode"));
 
-    let latch = SubCommand::with_name("latch")
+    let dtx = SubCommand::with_name("dtx")
         .about("Control the latch/dtx-system on the Surface Book 2")
         .setting(AppSettings::SubcommandRequiredElseHelp)
         .subcommand(SubCommand::with_name("lock")
@@ -60,7 +60,7 @@ pub fn app() -> App<'static, 'static> {
         .global_settings(&settings)
         .subcommand(status)
         .subcommand(perf)
-        .subcommand(latch)
+        .subcommand(dtx)
         .arg(Arg::with_name("quiet")
             .help("Keep output quiet")
             .short("q")

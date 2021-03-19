@@ -47,7 +47,7 @@ impl Device {
         match result {
             Ok(file) => Ok(Device { file }),
             Err(ref e) if e.kind() == std::io::ErrorKind::NotFound => {
-                Err(failure::err_msg("Surface latch device not found"))
+                Err(failure::err_msg("Surface DTX device not found"))
                     .context(ErrorKind::DeviceAccess)
                     .map_err(Into::into)
             },
