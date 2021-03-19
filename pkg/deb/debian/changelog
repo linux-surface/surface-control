@@ -1,3 +1,9 @@
+surface-control (0.3.1-2) unstable; urgency=medium
+
+  * Bump release to build for Fedora 34
+
+ -- Dorian Stoll <dorian.stoll@tmsp.io>  Fri, 19 Mar 2021 07:57:42 +0100
+
 surface-control (0.3.1-1) unstable; urgency=medium
 
   * Add setup for surface-control group to manage permissions
@@ -91,4 +97,3 @@ surface-control (0.1.0) unstable; urgency=medium
   * Initial release
 
  -- Maximilian Luz <luzmaximilian@gmail.com>  Sun, 13 Apr 2019 16:50:43 +0000
- 
