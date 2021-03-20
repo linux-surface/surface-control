@@ -19,8 +19,8 @@ pub enum DtxError {
     #[error("Unknown error: {0:#04x}")]
     Unsupported(u16),
 
-    #[error("Invalid value: {0:#04x}")]
-    Invalid(u16),
+    #[error(transparent)]
+    Protocol { #[from] details: ProtocolError, }
 }
 
 #[derive(thiserror::Error, Debug, Clone, Copy)]
@@ -48,6 +48,18 @@ pub enum DtxHardwareError {
 
     #[error("Unknown error: {0:#04x}")]
     Unknown(u16),
+}
+
+#[derive(thiserror::Error, Debug, Clone, Copy)]
+pub enum ProtocolError {
+    #[error("Invalid value for base state: {0:#04x}")]
+    BaseState(u8),
+
+    #[error("Invalid value for device mode: {0:#04x}")]
+    DeviceMode(u8),
+
+    #[error("Invalid value for latch status: {0:#04x}")]
+    LatchStatus(u8),
 }
 
 pub type DtxResult<T> = std::result::Result<T, DtxError>;
@@ -107,7 +119,7 @@ impl TryFrom<u16> for DeviceMode {
             uapi::SDTX_DEVICE_MODE_TABLET => Ok(DeviceMode::Tablet),
             uapi::SDTX_DEVICE_MODE_LAPTOP => Ok(DeviceMode::Laptop),
             uapi::SDTX_DEVICE_MODE_STUDIO => Ok(DeviceMode::Studio),
-            v                             => Err(DtxError::Invalid(v)),     // TODO: add info about type of value
+            v => Err(ProtocolError::DeviceMode(v as u8).into()),
         }
     }
 }
@@ -141,7 +153,7 @@ impl TryFrom<u16> for LatchStatus {
         match translate_status_code(value)? {
             uapi::SDTX_LATCH_CLOSED => Ok(LatchStatus::Closed),
             uapi::SDTX_LATCH_OPENED => Ok(LatchStatus::Opened),
-            v                       => Err(DtxError::Invalid(v)),     // TODO: add info about type of value
+            v => Err(ProtocolError::LatchStatus(v as u8).into()),
         }
     }
 }
@@ -175,7 +187,7 @@ impl TryFrom<u16> for BaseState {
         match translate_status_code(value)? {
             uapi::SDTX_BASE_DETACHED => Ok(BaseState::Detached),
             uapi::SDTX_BASE_ATTACHED => Ok(BaseState::Attached),
-            v                        => Err(DtxError::Invalid(v)),     // TODO: add info about type of value
+            v => Err(ProtocolError::BaseState(v as u8).into()),
         }
     }
 }
