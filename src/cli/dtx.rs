@@ -26,15 +26,18 @@ impl DynCommand for Command {
             .subcommand(SubCommand::with_name("request")
                 .about("Request latch-open or abort if already in progress")
                 .display_order(3))
+            .subcommand(SubCommand::with_name("confirm")
+                .about("Confirm latch-open if detachment in progress")
+                .display_order(4))
             .subcommand(SubCommand::with_name("get-base")
                 .about("Get information about the currently attached base")
-                .display_order(4))
+                .display_order(5))
             .subcommand(SubCommand::with_name("get-devicemode")
                 .about("Query the current device operation mode")
-                .display_order(4))
+                .display_order(6))
             .subcommand(SubCommand::with_name("get-latchstatus")
                 .about("Query the current latch status")
-                .display_order(4))
+                .display_order(7))
     }
 
     fn execute(&self, m: &clap::ArgMatches) -> Result<()> {
@@ -42,6 +45,7 @@ impl DynCommand for Command {
             ("lock",            Some(m)) => self.lock(m),
             ("unlock",          Some(m)) => self.unlock(m),
             ("request",         Some(m)) => self.request(m),
+            ("confirm",         Some(m)) => self.confirm(m),
             ("get-base",        Some(m)) => self.get_base_info(m),
             ("get-devicemode",  Some(m)) => self.get_device_mode(m),
             ("get-latchstatus", Some(m)) => self.get_latch_status(m),
@@ -85,6 +89,19 @@ impl Command {
 
         if !m.is_present("quiet") {
             println!("Clipboard latch request executed");
+        }
+
+        Ok(())
+    }
+
+    fn confirm(&self, m: &clap::ArgMatches) -> Result<()> {
+        sys::dtx::Device::open()
+            .context("Failed to open DTX device")?
+            .latch_confirm()
+            .context("Failed to send confirmation")?;
+
+        if !m.is_present("quiet") {
+            println!("Clipboard detachment confirmed");
         }
 
         Ok(())

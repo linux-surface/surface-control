@@ -262,6 +262,12 @@ impl Device {
             .map(|_| ())
     }
 
+    pub fn latch_confirm(&self) -> Result<()> {
+        unsafe { uapi::dtx_latch_confirm(self.file.as_raw_fd()) }
+            .map_err(|source| Error::IoctlError { source })
+            .map(|_| ())
+    }
+
     pub fn get_base_info(&self) -> Result<BaseInfo> {
         let mut info = uapi::BaseInfo { state: 0, base_id: 0 };
 
