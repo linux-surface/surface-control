@@ -76,7 +76,7 @@ fn translate_status_code(value: u16) -> DtxResult<u16> {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum DeviceMode {
     Tablet,
     Laptop,
@@ -113,7 +113,7 @@ impl TryFrom<u16> for DeviceMode {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum LatchStatus {
     Closed,
     Opened,
@@ -251,14 +251,14 @@ mod uapi {
     pub const SDTX_EVENT_LATCH_STATUS: u16        = 4;
     pub const SDTX_EVENT_DEVICE_MODE: u16         = 5;
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone, Copy)]
     #[repr(C)]
     pub struct EventHeader {
         length: u16,
         code: u16,
     }
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone, Copy)]
     #[repr(C)]
     pub struct BaseInfo {
         state: u16,
