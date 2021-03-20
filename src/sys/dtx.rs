@@ -147,6 +147,87 @@ impl TryFrom<u16> for LatchStatus {
 }
 
 
+#[derive(Debug, Clone, Copy)]
+pub enum BaseState {
+    Detached,
+    Attached,
+}
+
+impl BaseState {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            BaseState::Detached => "Detached",
+            BaseState::Attached => "Attached",
+        }
+    }
+}
+
+impl std::fmt::Display for BaseState {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl TryFrom<u16> for BaseState {
+    type Error = DtxError;
+
+    fn try_from(value: u16) -> DtxResult<Self> {
+        match translate_status_code(value)? {
+            uapi::SDTX_BASE_DETACHED => Ok(BaseState::Detached),
+            uapi::SDTX_BASE_ATTACHED => Ok(BaseState::Attached),
+            v                        => Err(DtxError::Invalid(v)),     // TODO: add info about type of value
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum DeviceType {
+    Hid,
+    Ssh,
+    Unknown(u8),
+}
+
+impl std::fmt::Display for DeviceType {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match *self {
+            DeviceType::Hid        => write!(f, "HID"),
+            DeviceType::Ssh        => write!(f, "SSH"),
+            DeviceType::Unknown(v) => write!(f, "{:#02x}", v),
+        }
+    }
+}
+
+impl From<u16> for DeviceType {
+    fn from(value: u16) -> Self {
+        match value & uapi::SDTX_DEVICE_TYPE_MASK {
+            uapi::SDTX_DEVICE_TYPE_HID => DeviceType::Hid,
+            uapi::SDTX_DEVICE_TYPE_SSH => DeviceType::Ssh,
+            v                          => DeviceType::Unknown((v >> 8) as u8)
+        }
+    }
+}
+
+
+#[derive(Debug)]
+pub struct BaseInfo {
+    pub state:       BaseState,
+    pub device_type: DeviceType,
+    pub id:          u8,
+}
+
+impl TryFrom<uapi::BaseInfo> for BaseInfo {
+    type Error = DtxError;
+
+    fn try_from(value: uapi::BaseInfo) -> DtxResult<Self> {
+        let state = BaseState::try_from(value.state)?;
+        let device_type = DeviceType::from(value.base_id);
+        let id = (value.base_id & 0xff) as u8;
+
+        Ok(BaseInfo { state, device_type, id })
+    }
+}
+
+
 #[derive(Debug)]
 pub struct Device {
     file: File,
@@ -179,6 +260,16 @@ impl Device {
         unsafe { uapi::dtx_latch_request(self.file.as_raw_fd()) }
             .map_err(|source| Error::IoctlError { source })
             .map(|_| ())
+    }
+
+    pub fn get_base_info(&self) -> Result<BaseInfo> {
+        let mut info = uapi::BaseInfo { state: 0, base_id: 0 };
+
+        unsafe { uapi::dtx_get_base_info(self.file.as_raw_fd(), &mut info as *mut uapi::BaseInfo) }
+            .map_err(|source| Error::IoctlError { source })?;
+
+        BaseInfo::try_from(info)
+            .map_err(|source| Error::DtxError { source })
     }
 
     pub fn get_device_mode(&self) -> Result<DeviceMode> {
@@ -254,15 +345,15 @@ mod uapi {
     #[derive(Debug, Clone, Copy)]
     #[repr(C)]
     pub struct EventHeader {
-        length: u16,
-        code: u16,
+        pub length: u16,
+        pub code: u16,
     }
 
     #[derive(Debug, Clone, Copy)]
     #[repr(C)]
     pub struct BaseInfo {
-        state: u16,
-        base_id: u16,
+        pub state: u16,
+        pub base_id: u16,
     }
 
     ioctl_none!(dtx_events_enable,    0xa5, 0x21);

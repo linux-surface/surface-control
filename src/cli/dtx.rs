@@ -26,6 +26,9 @@ impl DynCommand for Command {
             .subcommand(SubCommand::with_name("request")
                 .about("Request latch-open or abort if already in progress")
                 .display_order(3))
+            .subcommand(SubCommand::with_name("get-base")
+                .about("Get information about the currently attached base")
+                .display_order(4))
             .subcommand(SubCommand::with_name("get-devicemode")
                 .about("Query the current device operation mode")
                 .display_order(4))
@@ -39,6 +42,7 @@ impl DynCommand for Command {
             ("lock",            Some(m)) => self.lock(m),
             ("unlock",          Some(m)) => self.unlock(m),
             ("request",         Some(m)) => self.request(m),
+            ("get-base",        Some(m)) => self.get_base_info(m),
             ("get-devicemode",  Some(m)) => self.get_device_mode(m),
             ("get-latchstatus", Some(m)) => self.get_latch_status(m),
             _                            => unreachable!(),
@@ -81,6 +85,29 @@ impl Command {
 
         if !m.is_present("quiet") {
             println!("Clipboard latch request executed");
+        }
+
+        Ok(())
+    }
+
+    fn get_base_info(&self, m: &clap::ArgMatches) -> Result<()> {
+        let info = sys::dtx::Device::open()
+            .context("Failed to open DTX device")?
+            .get_base_info()
+            .context("Failed to get base info")?;
+
+        if !m.is_present("quiet") {
+            println!("State:       {}", info.state);
+            println!("Device-Type: {}", info.device_type);
+            println!("ID:          {:#04x}", info.id);
+        } else {
+            if let sys::dtx::DeviceType::Unknown(ty) = info.device_type {
+                println!("{{ \"state\": \"{}\", \"type\": {}, \"id\": {} }}",
+                         info.state, ty, info.id);
+            } else {
+                println!("{{ \"state\": \"{}\", \"type\": \"{}\", \"id\": {} }}",
+                         info.state, info.device_type, info.id);
+            }
         }
 
         Ok(())
