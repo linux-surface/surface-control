@@ -32,7 +32,7 @@ pub enum DtxRuntimeError {
     Timeout,
 
     #[error("Unknown error: {0:#04x}")]
-    Unknown(u16),
+    Unknown(u8),
 }
 
 #[derive(thiserror::Error, Debug, Clone, Copy)]
@@ -47,7 +47,7 @@ pub enum DtxHardwareError {
     FailedToClose,
 
     #[error("Unknown error: {0:#04x}")]
-    Unknown(u16),
+    Unknown(u8),
 }
 
 #[derive(thiserror::Error, Debug, Clone, Copy)]
@@ -71,7 +71,7 @@ fn translate_status_code(value: u16) -> DtxResult<u16> {
             details: match value {
                 uapi::SDTX_DETACH_NOT_FEASIBLE        => DtxRuntimeError::NotFeasible,
                 uapi::SDTX_DETACH_TIMEOUT             => DtxRuntimeError::Timeout,
-                v                                     => DtxRuntimeError::Unknown(v)
+                v => DtxRuntimeError::Unknown((v & uapi::SDTX_VALUE_MASK) as u8)
             },
         }),
         uapi::SDTX_CATEGORY_HARDWARE_ERROR => Err(DtxError::HardwareError {
@@ -79,7 +79,7 @@ fn translate_status_code(value: u16) -> DtxResult<u16> {
                 uapi::SDTX_ERR_FAILED_TO_OPEN         => DtxHardwareError::FailedToOpen,
                 uapi::SDTX_ERR_FAILED_TO_REMAIN_OPEN  => DtxHardwareError::FailedToRemainOpen,
                 uapi::SDTX_ERR_FAILED_TO_CLOSE        => DtxHardwareError::FailedToClose,
-                v                                     => DtxHardwareError::Unknown(v)
+                v => DtxHardwareError::Unknown((v & uapi::SDTX_VALUE_MASK) as u8)
             },
         }),
         uapi::SDTX_CATEGORY_UNKNOWN => Err(DtxError::Unknown(value)),
