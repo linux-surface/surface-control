@@ -246,8 +246,10 @@ pub struct Device {
 }
 
 impl Device {
+    const DEFAULT_DEVICE_FILE_PATH: &'static str = "/dev/surface/dtx";
+
     pub fn open() -> Result<Self> {
-        Device::open_path("/dev/surface/dtx")
+        Device::open_path(Device::DEFAULT_DEVICE_FILE_PATH)
     }
 
     pub fn open_path<P: AsRef<Path>>(path: P) -> Result<Self> {
