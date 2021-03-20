@@ -324,7 +324,7 @@ impl Device {
 }
 
 
-#[allow(unused)]
+#[allow(unused, clippy::identity_op)]
 mod uapi {
     use nix::{ioctl_none, ioctl_read};
 

@@ -151,14 +151,14 @@ impl Command {
             println!("State:       {}", info.state);
             println!("Device-Type: {}", info.device_type);
             println!("ID:          {:#04x}", info.id);
+
+        } else if let sys::dtx::DeviceType::Unknown(ty) = info.device_type {
+            println!("{{ \"state\": \"{}\", \"type\": {}, \"id\": {} }}",
+                     info.state, ty, info.id);
+
         } else {
-            if let sys::dtx::DeviceType::Unknown(ty) = info.device_type {
-                println!("{{ \"state\": \"{}\", \"type\": {}, \"id\": {} }}",
-                         info.state, ty, info.id);
-            } else {
-                println!("{{ \"state\": \"{}\", \"type\": \"{}\", \"id\": {} }}",
-                         info.state, info.device_type, info.id);
-            }
+            println!("{{ \"state\": \"{}\", \"type\": \"{}\", \"id\": {} }}",
+                     info.state, info.device_type, info.id);
         }
 
         Ok(())
