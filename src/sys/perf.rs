@@ -14,8 +14,6 @@ pub enum Mode {
 
 impl Mode {
     pub fn from_str(s: &str) -> Option<Self> {
-        // TODO: handle other strings?
-
         match s {
             "1" => Some(Mode::Normal),
             "2" => Some(Mode::Battery),
