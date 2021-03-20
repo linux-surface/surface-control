@@ -1,8 +1,79 @@
-use std::fs::File;
+use std::{convert::TryFrom, fs::File};
 use std::path::Path;
 use std::os::unix::io::AsRawFd;
 
 use crate::sys::{Error, Result};
+
+
+#[derive(thiserror::Error, Debug, Clone, Copy)]
+pub enum DtxError {
+    #[error("Runtime error: {details}")]
+    RuntimeError { details: DtxRuntimeError },
+
+    #[error("Hardware error: {details}")]
+    HardwareError { details: DtxHardwareError },
+
+    #[error("Unknown firmware status code: {0:#04x}")]
+    Unknown(u16),
+
+    #[error("Unknown error: {0:#04x}")]
+    Unsupported(u16),
+
+    #[error("Invalid value: {0:#04x}")]
+    Invalid(u16),
+}
+
+#[derive(thiserror::Error, Debug, Clone, Copy)]
+pub enum DtxRuntimeError {
+    #[error("Detachment preconditions not fulfilled")]
+    NotFeasible,
+
+    #[error("Detach operation timed out")]
+    Timeout,
+
+    #[error("Unknown error: {0:#04x}")]
+    Unknown(u16),
+}
+
+#[derive(thiserror::Error, Debug, Clone, Copy)]
+pub enum DtxHardwareError {
+    #[error("Failed to open latch")]
+    FailedToOpen,
+
+    #[error("Latch failed to remain open")]
+    FailedToRemainOpen,
+
+    #[error("Failed to close latch")]
+    FailedToClose,
+
+    #[error("Unknown error: {0:#04x}")]
+    Unknown(u16),
+}
+
+pub type DtxResult<T> = std::result::Result<T, DtxError>;
+
+fn translate_status_code(value: u16) -> DtxResult<u16> {
+    match value & uapi::SDTX_CATEGORY_MASK {
+        uapi::SDTX_CATEGORY_STATUS => Ok(value),
+        uapi::SDTX_CATEGORY_RUNTIME_ERROR => Err(DtxError::RuntimeError {
+            details: match value {
+                uapi::SDTX_DETACH_NOT_FEASIBLE        => DtxRuntimeError::NotFeasible,
+                uapi::SDTX_DETACH_TIMEOUT             => DtxRuntimeError::Timeout,
+                v                                     => DtxRuntimeError::Unknown(v)
+            },
+        }),
+        uapi::SDTX_CATEGORY_HARDWARE_ERROR => Err(DtxError::HardwareError {
+            details: match value {
+                uapi::SDTX_ERR_FAILED_TO_OPEN         => DtxHardwareError::FailedToOpen,
+                uapi::SDTX_ERR_FAILED_TO_REMAIN_OPEN  => DtxHardwareError::FailedToRemainOpen,
+                uapi::SDTX_ERR_FAILED_TO_CLOSE        => DtxHardwareError::FailedToClose,
+                v                                     => DtxHardwareError::Unknown(v)
+            },
+        }),
+        uapi::SDTX_CATEGORY_UNKNOWN => Err(DtxError::Unknown(value)),
+        _                           => Err(DtxError::Unsupported(value))
+    }
+}
 
 
 #[derive(Debug)]
@@ -25,6 +96,19 @@ impl DeviceMode {
 impl std::fmt::Display for DeviceMode {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", self.as_str())
+    }
+}
+
+impl TryFrom<u16> for DeviceMode {
+    type Error = DtxError;
+
+    fn try_from(value: u16) -> DtxResult<Self> {
+        match translate_status_code(value)? {
+            uapi::SDTX_DEVICE_MODE_TABLET => Ok(DeviceMode::Tablet),
+            uapi::SDTX_DEVICE_MODE_LAPTOP => Ok(DeviceMode::Laptop),
+            uapi::SDTX_DEVICE_MODE_STUDIO => Ok(DeviceMode::Studio),
+            v                             => Err(DtxError::Invalid(v)),     // TODO: add info about type of value
+        }
     }
 }
 
@@ -69,12 +153,8 @@ impl Device {
         unsafe { uapi::dtx_get_device_mode(self.file.as_raw_fd(), &mut mode as *mut u16) }
             .map_err(|source| Error::IoctlError { source })?;
 
-        match mode {
-            0 => Ok(DeviceMode::Tablet),
-            1 => Ok(DeviceMode::Laptop),
-            2 => Ok(DeviceMode::Studio),
-            _ => Err(Error::InvalidData),
-        }
+        DeviceMode::try_from(mode)
+            .map_err(|source| Error::DtxError { source })
     }
 }
 

@@ -17,6 +17,9 @@ pub enum Error {
     #[error("I/O error")]
     IoctlError { source: nix::Error },
 
+    #[error("DTX subsystem error")]
+    DtxError { source: dtx::DtxError },
+
     #[error("Invalid data")]
     InvalidData,
 }
