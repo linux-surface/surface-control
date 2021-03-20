@@ -26,18 +26,18 @@ impl DynCommand for Command {
             .subcommand(SubCommand::with_name("request")
                 .about("Request latch-open or abort if already in progress")
                 .display_order(3))
-            .subcommand(SubCommand::with_name("get-opmode")
+            .subcommand(SubCommand::with_name("get-devicemode")
                 .about("Query the current device operation mode")
                 .display_order(4))
     }
 
     fn execute(&self, m: &clap::ArgMatches) -> Result<()> {
         match m.subcommand() {
-            ("lock",       Some(m)) => self.lock(m),
-            ("unlock",     Some(m)) => self.unlock(m),
-            ("request",    Some(m)) => self.request(m),
-            ("get-opmode", Some(m)) => self.get_opmode(m),
-            _                       => unreachable!(),
+            ("lock",           Some(m)) => self.lock(m),
+            ("unlock",         Some(m)) => self.unlock(m),
+            ("request",        Some(m)) => self.request(m),
+            ("get-devicemode", Some(m)) => self.get_device_mode(m),
+            _                           => unreachable!(),
         }
     }
 }
@@ -82,16 +82,16 @@ impl Command {
         Ok(())
     }
 
-    fn get_opmode(&self, m: &clap::ArgMatches) -> Result<()> {
-        let opmode = sys::dtx::Device::open()
+    fn get_device_mode(&self, m: &clap::ArgMatches) -> Result<()> {
+        let mode = sys::dtx::Device::open()
             .context("Failed to open DTX device")?
-            .get_opmode()
+            .get_device_mode()
             .context("Failed to get device mode")?;
 
         if !m.is_present("quiet") {
-            println!("Device is in '{}' mode", opmode);
+            println!("Device is in '{}' mode", mode);
         } else {
-            println!("{}", opmode);
+            println!("{}", mode);
         }
 
         Ok(())

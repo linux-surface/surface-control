@@ -19,8 +19,8 @@ impl DynCommand for Command {
     fn execute(&self, _: &clap::ArgMatches) -> Result<()> {
         let mut found = false;
 
-        let opmode = sys::dtx::Device::open().and_then(|d| d.get_opmode());
-        let opmode = match opmode {
+        let mode = sys::dtx::Device::open().and_then(|d| d.get_device_mode());
+        let mode = match mode {
             Ok(x) => { found = true; Some(x) },
             Err(sys::Error::DeviceAccess { .. }) => None,
             Err(e) => return Err(e).context("Failed to access DTX device"),
@@ -33,9 +33,11 @@ impl DynCommand for Command {
             Err(e) => return Err(e).context("Failed to access performance mode device"),
         };
 
+        // TODO: print dGPU power state
+
         if found {
-            if let Some(opmode) = opmode {
-                println!("       Device-Mode: {}", opmode);
+            if let Some(mode) = mode {
+                println!("       Device-Mode: {}", mode);
             }
             if let Some(perf_mode) = perf_mode {
                 println!("  Performance-Mode: {} ({})", perf_mode, perf_mode.short_str());

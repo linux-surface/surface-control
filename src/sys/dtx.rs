@@ -8,23 +8,23 @@ use crate::sys::{Error, Result};
 
 
 #[derive(Debug)]
-pub enum OpMode {
+pub enum DeviceMode {
     Tablet,
     Laptop,
     Studio,
 }
 
-impl OpMode {
+impl DeviceMode {
     pub fn as_str(&self) -> &'static str {
         match self {
-            OpMode::Tablet => "Tablet",
-            OpMode::Laptop => "Laptop",
-            OpMode::Studio => "Studio",
+            DeviceMode::Tablet => "Tablet",
+            DeviceMode::Laptop => "Laptop",
+            DeviceMode::Studio => "Studio",
         }
     }
 }
 
-impl std::fmt::Display for OpMode {
+impl std::fmt::Display for DeviceMode {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", self.as_str())
     }
@@ -65,16 +65,16 @@ impl Device {
             .map(|_| ())
     }
 
-    pub fn get_opmode(&self) -> Result<OpMode> {
-        let mut opmode: u16 = 0;
+    pub fn get_device_mode(&self) -> Result<DeviceMode> {
+        let mut mode: u16 = 0;
 
-        unsafe { dtx_get_opmode(self.file.as_raw_fd(), &mut opmode as *mut u16) }
+        unsafe { dtx_get_opmode(self.file.as_raw_fd(), &mut mode as *mut u16) }
             .map_err(|source| Error::IoctlError { source })?;
 
-        match opmode {
-            0 => Ok(OpMode::Tablet),
-            1 => Ok(OpMode::Laptop),
-            2 => Ok(OpMode::Studio),
+        match mode {
+            0 => Ok(DeviceMode::Tablet),
+            1 => Ok(DeviceMode::Laptop),
+            2 => Ok(DeviceMode::Studio),
             _ => Err(Error::InvalidData),
         }
     }
