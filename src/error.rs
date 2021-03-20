@@ -61,8 +61,6 @@ impl std::fmt::Display for Error {
 }
 
 
-pub type CliResult = std::result::Result<(), CliError>;
-
 pub struct CliError {
     error: Error,
 }
