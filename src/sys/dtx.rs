@@ -227,7 +227,7 @@ pub enum Event {
     Unknown { code: u16, data: Vec<u8> },
 }
 
-mod event {
+pub mod event {
     use super::*;
 
     use std::convert::TryInto;
@@ -600,7 +600,7 @@ impl<'a> Iterator for EventStream<'a> {
 
 
 #[allow(clippy::identity_op)]
-mod uapi {
+pub mod uapi {
     use nix::{ioctl_none, ioctl_read};
 
     // status/error categories

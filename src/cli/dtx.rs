@@ -152,17 +152,15 @@ impl Command {
             .context("Failed to get base info")?;
 
         if !m.is_present("quiet") {
-            println!("State:       {}", info.state);
-            println!("Device-Type: {}", info.device_type);
-            println!("ID:          {:#04x}", info.id);
-
-        } else if let sys::dtx::DeviceType::Unknown(ty) = info.device_type {
-            println!("{{ \"state\": \"{}\", \"type\": {}, \"id\": {} }}",
-                     info.state, ty, info.id);
+            println!("State: {}", info.state);
+            println!("Type:  {}", info.device_type);
+            println!("ID:    {:#04x}", info.id);
 
         } else {
-            println!("{{ \"state\": \"{}\", \"type\": \"{}\", \"id\": {} }}",
-                     info.state, info.device_type, info.id);
+            let text = serde_json::to_string(&PrettyBaseInfo(info))
+                .context("Failed to serialize data")?;
+
+            println!("{}", text);
         }
 
         Ok(())
@@ -198,21 +196,247 @@ impl Command {
         Ok(())
     }
 
-    fn monitor(&self, _m: &clap::ArgMatches) -> Result<()> {
+    fn monitor(&self, m: &clap::ArgMatches) -> Result<()> {
         let mut device = sys::dtx::Device::open()
             .context("Failed to open DTX device")?;
 
         let events = device.events()
             .context("Failed to set up event stream")?;
 
+        let quiet = m.is_present("quiet");
+
         for event in events {
             let event = event
                 .map_err(|source| sys::Error::IoError { source })
                 .context("Error reading event")?;
 
-            println!("{:?}", event);
+            if !quiet {
+                println!("{}", PrettyEvent(event));
+
+            } else {
+                let text = serde_json::to_string(&PrettyEvent(event))
+                    .context("Failed to serialize data")?;
+
+                println!("{}", text);
+            }
         }
 
         Ok(())
+    }
+}
+
+
+struct PrettyBaseInfo(sys::dtx::BaseInfo);
+
+impl serde::Serialize for PrettyBaseInfo {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer
+    {
+        use serde::ser::SerializeStruct;
+
+        let mut s = serializer.serialize_struct("BaseInfo", 3)?;
+
+        match self.0.state {
+            sys::dtx::BaseState::Attached    => s.serialize_field("state", "attached"),
+            sys::dtx::BaseState::Detached    => s.serialize_field("state", "detached"),
+            sys::dtx::BaseState::NotFeasible => s.serialize_field("state", "not-feasible"),
+        }?;
+
+        match self.0.device_type {
+            sys::dtx::DeviceType::Hid        => s.serialize_field("type", "hid"),
+            sys::dtx::DeviceType::Ssh        => s.serialize_field("type", "ssh"),
+            sys::dtx::DeviceType::Unknown(x) => s.serialize_field("type", &x),
+        }?;
+
+        s.serialize_field("id", &self.0.id)?;
+        s.end()
+    }
+}
+
+
+struct PrettyEvent(sys::dtx::Event);
+
+impl serde::Serialize for PrettyEvent {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer
+    {
+        use serde::ser::SerializeStruct;
+        use sys::dtx::{DeviceType, Event, HardwareError, RuntimeError, uapi};
+        use sys::dtx::event::{BaseState, CancelReason, DeviceMode, LatchStatus};
+
+        match &self.0 {
+            Event::Request => {
+                let mut s = serializer.serialize_struct("Event", 1)?;
+                s.serialize_field("type", "request")?;
+                s.end()
+            },
+
+            Event::Cancel { reason } => {
+                let mut s = serializer.serialize_struct("Event", 2)?;
+                s.serialize_field("type", "cancel")?;
+
+                match reason {
+                    CancelReason::Hardware(err) => match err {
+                        HardwareError::FailedToOpen       => s.serialize_field("reason", "failed-to-open"),
+                        HardwareError::FailedToRemainOpen => s.serialize_field("reason", "failed-to-remain-open"),
+                        HardwareError::FailedToClose      => s.serialize_field("reason", "failed-to-close"),
+                        HardwareError::Unknown(x) => {
+                            s.serialize_field("reason", &(*x as u16 | uapi::SDTX_CATEGORY_HARDWARE_ERROR))
+                        },
+                    },
+                    CancelReason::Runtime(err) => match err {
+                        RuntimeError::NotFeasible => s.serialize_field("reason", "not-feasible"),
+                        RuntimeError::Timeout     => s.serialize_field("reason", "timeout"),
+                        RuntimeError::Unknown(x) => {
+                            s.serialize_field("reason", &(*x as u16 | uapi::SDTX_CATEGORY_RUNTIME_ERROR))
+                        },
+                    },
+                    CancelReason::Unknown(x) => s.serialize_field("reason", x),
+                }?;
+
+                s.end()
+            },
+
+            Event::BaseConnection { state, device_type, id } => {
+                let mut s = serializer.serialize_struct("Event", 4)?;
+                s.serialize_field("type", "base-connection")?;
+
+                match state {
+                    BaseState::Attached    => s.serialize_field("state", "attached"),
+                    BaseState::Detached    => s.serialize_field("state", "detached"),
+                    BaseState::NotFeasible => s.serialize_field("state", "not-feasible"),
+                    BaseState::Unknown(x)  => s.serialize_field("state", x),
+                }?;
+
+                match device_type {
+                    DeviceType::Hid        => s.serialize_field("device-type", "hid"),
+                    DeviceType::Ssh        => s.serialize_field("device-type", "ssh"),
+                    DeviceType::Unknown(x) => s.serialize_field("device-type", &x),
+                }?;
+
+                s.serialize_field("id", id)?;
+                s.end()
+            },
+
+            Event::LatchStatus { status } => {
+                let mut s = serializer.serialize_struct("Event", 2)?;
+                s.serialize_field("type", "latch-status")?;
+
+                match status {
+                    LatchStatus::Closed     => s.serialize_field("status", "closed"),
+                    LatchStatus::Opened     => s.serialize_field("status", "opened"),
+                    LatchStatus::Error(err) => match err {
+                        HardwareError::FailedToOpen       => s.serialize_field("status", "failed-to-open"),
+                        HardwareError::FailedToRemainOpen => s.serialize_field("status", "failed-to-remain-open"),
+                        HardwareError::FailedToClose      => s.serialize_field("status", "failed-to-close"),
+                        HardwareError::Unknown(x) => {
+                            s.serialize_field("status", &(*x as u16 | uapi::SDTX_CATEGORY_HARDWARE_ERROR))
+                        },
+                    },
+                    LatchStatus::Unknown(x) => s.serialize_field("status", x),
+                }?;
+
+                s.end()
+            },
+
+            Event::DeviceMode { mode } => {
+                let mut s = serializer.serialize_struct("Event", 2)?;
+                s.serialize_field("type", "device-mode")?;
+
+                match mode {
+                    DeviceMode::Tablet     => s.serialize_field("mode", "tablet"),
+                    DeviceMode::Laptop     => s.serialize_field("mode", "laptop"),
+                    DeviceMode::Studio     => s.serialize_field("mode", "studio"),
+                    DeviceMode::Unknown(x) => s.serialize_field("mode", x),
+                }?;
+
+                s.end()
+            },
+
+            Event::Unknown { code, data } => {
+                let mut s = serializer.serialize_struct("Event", 2)?;
+                s.serialize_field("type", code)?;
+                s.serialize_field("data", data)?;
+                s.end()
+            },
+        }
+    }
+}
+
+impl std::fmt::Display for PrettyEvent {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        use sys::dtx::{DeviceType, Event};
+        use sys::dtx::event::{BaseState, CancelReason, DeviceMode, LatchStatus};
+
+        match &self.0 {
+            Event::Request => {
+                write!(f, "Request")
+            },
+
+            Event::Cancel { reason } => {
+                write!(f, "Cancel         {{ Reason: ")?;
+
+                match reason {
+                    CancelReason::Hardware(err) => write!(f, "\"{}\"", err),
+                    CancelReason::Runtime(err)  => write!(f, "\"{}\"", err),
+                    CancelReason::Unknown(err)  => write!(f, "{:#04x}", err),
+                }?;
+
+                write!(f, " }}")
+            },
+
+            Event::BaseConnection { state, device_type, id } => {
+                write!(f, "BaseConnection {{ State: ")?;
+
+                match state {
+                    BaseState::Detached    => write!(f, "Detached"),
+                    BaseState::Attached    => write!(f, "Attached"),
+                    BaseState::NotFeasible => write!(f, "NotFeasible"),
+                    BaseState::Unknown(x)  => write!(f, "{:#04x}", x),
+                }?;
+
+                write!(f, ", DeviceType: ")?;
+
+                match device_type {
+                    DeviceType::Hid        => write!(f, "Hid"),
+                    DeviceType::Ssh        => write!(f, "Ssh"),
+                    DeviceType::Unknown(x) => write!(f, "{:#04x}", x),
+                }?;
+
+                write!(f, ", Id: {:#04x} }}", id)
+            },
+
+            Event::LatchStatus { status } => {
+                write!(f, "LatchStatus    {{ Status: ")?;
+
+                match status {
+                    LatchStatus::Closed     => write!(f, "Closed"),
+                    LatchStatus::Opened     => write!(f, "Opened"),
+                    LatchStatus::Error(err) => write!(f, "\"Error: {}\"", err),
+                    LatchStatus::Unknown(x) => write!(f, "{:#04x}", x),
+                }?;
+
+                write!(f, " }}")
+            },
+
+            Event::DeviceMode { mode } => {
+                write!(f, "DeviceMode     {{ Status: ")?;
+
+                match mode {
+                    DeviceMode::Tablet     => write!(f, "Tablet"),
+                    DeviceMode::Laptop     => write!(f, "Laptop"),
+                    DeviceMode::Studio     => write!(f, "Studio"),
+                    DeviceMode::Unknown(x) => write!(f, "{:#04x}", x),
+                }?;
+
+                write!(f, " }}")
+            },
+
+            Event::Unknown { code, data } => {
+                write!(f, "Unknown        {{ Code: {:#04x}, Data: {:02x?} }}", code, data)
+            },
+        }
     }
 }
