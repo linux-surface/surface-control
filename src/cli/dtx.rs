@@ -29,15 +29,19 @@ impl DynCommand for Command {
             .subcommand(SubCommand::with_name("get-devicemode")
                 .about("Query the current device operation mode")
                 .display_order(4))
+            .subcommand(SubCommand::with_name("get-latchstatus")
+                .about("Query the current latch status")
+                .display_order(4))
     }
 
     fn execute(&self, m: &clap::ArgMatches) -> Result<()> {
         match m.subcommand() {
-            ("lock",           Some(m)) => self.lock(m),
-            ("unlock",         Some(m)) => self.unlock(m),
-            ("request",        Some(m)) => self.request(m),
-            ("get-devicemode", Some(m)) => self.get_device_mode(m),
-            _                           => unreachable!(),
+            ("lock",            Some(m)) => self.lock(m),
+            ("unlock",          Some(m)) => self.unlock(m),
+            ("request",         Some(m)) => self.request(m),
+            ("get-devicemode",  Some(m)) => self.get_device_mode(m),
+            ("get-latchstatus", Some(m)) => self.get_latch_status(m),
+            _                            => unreachable!(),
         }
     }
 }
@@ -92,6 +96,21 @@ impl Command {
             println!("Device is in '{}' mode", mode);
         } else {
             println!("{}", mode);
+        }
+
+        Ok(())
+    }
+
+    fn get_latch_status(&self, m: &clap::ArgMatches) -> Result<()> {
+        let status = sys::dtx::Device::open()
+            .context("Failed to open DTX device")?
+            .get_latch_status()
+            .context("Failed to get latch status")?;
+
+        if !m.is_present("quiet") {
+            println!("Latch has been '{}'", status);
+        } else {
+            println!("{}", status);
         }
 
         Ok(())

@@ -26,6 +26,13 @@ impl DynCommand for Command {
             Err(e) => return Err(e).context("Failed to access DTX device"),
         };
 
+        let lstat = sys::dtx::Device::open().and_then(|d| d.get_latch_status());
+        let lstat = match lstat {
+            Ok(x) => { found = true; Some(x) },
+            Err(sys::Error::DeviceAccess { .. }) => None,
+            Err(e) => return Err(e).context("Failed to access DTX device"),
+        };
+
         let perf_mode = sys::perf::Device::open().and_then(|d| d.get_mode());
         let perf_mode = match perf_mode {
             Ok(x) => { found = true; Some(x) },
@@ -36,11 +43,14 @@ impl DynCommand for Command {
         // TODO: print dGPU power state
 
         if found {
+            if let Some(perf_mode) = perf_mode {
+                println!("  Performance-Mode: {} ({})", perf_mode, perf_mode.short_str());
+            }
             if let Some(mode) = mode {
                 println!("       Device-Mode: {}", mode);
             }
-            if let Some(perf_mode) = perf_mode {
-                println!("  Performance-Mode: {} ({})", perf_mode, perf_mode.short_str());
+            if let Some(lstat) = lstat {
+                println!("      Latch-Status: {}", lstat);
             }
 
             Ok(())

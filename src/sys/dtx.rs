@@ -114,6 +114,40 @@ impl TryFrom<u16> for DeviceMode {
 
 
 #[derive(Debug)]
+pub enum LatchStatus {
+    Closed,
+    Opened,
+}
+
+impl LatchStatus {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            LatchStatus::Closed => "Closed",
+            LatchStatus::Opened => "Opened",
+        }
+    }
+}
+
+impl std::fmt::Display for LatchStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl TryFrom<u16> for LatchStatus {
+    type Error = DtxError;
+
+    fn try_from(value: u16) -> DtxResult<Self> {
+        match translate_status_code(value)? {
+            uapi::SDTX_LATCH_CLOSED => Ok(LatchStatus::Closed),
+            uapi::SDTX_LATCH_OPENED => Ok(LatchStatus::Opened),
+            v                       => Err(DtxError::Invalid(v)),     // TODO: add info about type of value
+        }
+    }
+}
+
+
+#[derive(Debug)]
 pub struct Device {
     file: File,
 }
@@ -154,6 +188,16 @@ impl Device {
             .map_err(|source| Error::IoctlError { source })?;
 
         DeviceMode::try_from(mode)
+            .map_err(|source| Error::DtxError { source })
+    }
+
+    pub fn get_latch_status(&self) -> Result<LatchStatus> {
+        let mut status: u16 = 0;
+
+        unsafe { uapi::dtx_get_latch_status(self.file.as_raw_fd(), &mut status as *mut u16) }
+            .map_err(|source| Error::IoctlError { source })?;
+
+        LatchStatus::try_from(status)
             .map_err(|source| Error::DtxError { source })
     }
 }
