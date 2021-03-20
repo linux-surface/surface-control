@@ -163,13 +163,15 @@ impl TryFrom<u16> for LatchStatus {
 pub enum BaseState {
     Detached,
     Attached,
+    NotFeasible,
 }
 
 impl BaseState {
     pub fn as_str(&self) -> &'static str {
         match self {
-            BaseState::Detached => "Detached",
-            BaseState::Attached => "Attached",
+            BaseState::Detached    => "Detached",
+            BaseState::Attached    => "Attached",
+            BaseState::NotFeasible => "NotFeasible",
         }
     }
 }
@@ -184,6 +186,10 @@ impl TryFrom<u16> for BaseState {
     type Error = DtxError;
 
     fn try_from(value: u16) -> DtxResult<Self> {
+        if value == uapi::SDTX_DETACH_NOT_FEASIBLE {
+            return Ok(BaseState::NotFeasible);
+        }
+
         match translate_status_code(value)? {
             uapi::SDTX_BASE_DETACHED => Ok(BaseState::Detached),
             uapi::SDTX_BASE_ATTACHED => Ok(BaseState::Attached),
