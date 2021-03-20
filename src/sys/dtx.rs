@@ -75,7 +75,7 @@ impl Device {
             0 => Ok(OpMode::Tablet),
             1 => Ok(OpMode::Laptop),
             2 => Ok(OpMode::Studio),
-            _ => Err(Error::from(Error::InvalidData)),
+            _ => Err(Error::InvalidData),
         }
     }
 }

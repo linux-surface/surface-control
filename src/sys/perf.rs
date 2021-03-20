@@ -106,7 +106,7 @@ impl Device {
             .map_err(|_| Error::InvalidData)?
             .trim();
 
-        Mode::from_str(state).ok_or_else(|| Error::InvalidData)
+        Mode::from_str(state).ok_or(Error::InvalidData)
     }
 
     pub fn set_mode(&self, mode: Mode) -> Result<()> {
