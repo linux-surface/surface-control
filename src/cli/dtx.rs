@@ -32,15 +32,18 @@ impl DynCommand for Command {
             .subcommand(SubCommand::with_name("hearbeat")
                 .about("Send hearbeat if detachment in progress")
                 .display_order(5))
+            .subcommand(SubCommand::with_name("cancel")
+                .about("Cancel any detachment in progress")
+                .display_order(6))
             .subcommand(SubCommand::with_name("get-base")
                 .about("Get information about the currently attached base")
-                .display_order(6))
+                .display_order(7))
             .subcommand(SubCommand::with_name("get-devicemode")
                 .about("Query the current device operation mode")
-                .display_order(7))
+                .display_order(8))
             .subcommand(SubCommand::with_name("get-latchstatus")
                 .about("Query the current latch status")
-                .display_order(8))
+                .display_order(9))
     }
 
     fn execute(&self, m: &clap::ArgMatches) -> Result<()> {
@@ -50,6 +53,7 @@ impl DynCommand for Command {
             ("request",         Some(m)) => self.request(m),
             ("confirm",         Some(m)) => self.confirm(m),
             ("heartbeat",       Some(m)) => self.heartbeat(m),
+            ("cancel",          Some(m)) => self.cancel(m),
             ("get-base",        Some(m)) => self.get_base_info(m),
             ("get-devicemode",  Some(m)) => self.get_device_mode(m),
             ("get-latchstatus", Some(m)) => self.get_latch_status(m),
@@ -119,6 +123,19 @@ impl Command {
 
         if !m.is_present("quiet") {
             println!("Clipboard detachment heartbeat sent");
+        }
+
+        Ok(())
+    }
+
+    fn cancel(&self, m: &clap::ArgMatches) -> Result<()> {
+        sys::dtx::Device::open()
+            .context("Failed to open DTX device")?
+            .latch_cancel()
+            .context("Failed to cancel detachment")?;
+
+        if !m.is_present("quiet") {
+            println!("Clipboard detachment canceled");
         }
 
         Ok(())
