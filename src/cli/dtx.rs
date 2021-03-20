@@ -44,6 +44,9 @@ impl DynCommand for Command {
             .subcommand(SubCommand::with_name("get-latchstatus")
                 .about("Query the current latch status")
                 .display_order(9))
+            .subcommand(SubCommand::with_name("monitor")
+                .about("Monitor DTX events")
+                .display_order(10))
     }
 
     fn execute(&self, m: &clap::ArgMatches) -> Result<()> {
@@ -57,6 +60,7 @@ impl DynCommand for Command {
             ("get-base",        Some(m)) => self.get_base_info(m),
             ("get-devicemode",  Some(m)) => self.get_device_mode(m),
             ("get-latchstatus", Some(m)) => self.get_latch_status(m),
+            ("monitor",         Some(m)) => self.monitor(m),
             _                            => unreachable!(),
         }
     }
@@ -189,6 +193,24 @@ impl Command {
             println!("Latch has been '{}'", status);
         } else {
             println!("{}", status);
+        }
+
+        Ok(())
+    }
+
+    fn monitor(&self, _m: &clap::ArgMatches) -> Result<()> {
+        let mut device = sys::dtx::Device::open()
+            .context("Failed to open DTX device")?;
+
+        let events = device.events()
+            .context("Failed to set up event stream")?;
+
+        for event in events {
+            let event = event
+                .map_err(|source| sys::Error::IoError { source })
+                .context("Error reading event")?;
+
+            println!("{:?}", event);
         }
 
         Ok(())

@@ -17,6 +17,7 @@ indoc = "1.0.3"
 nix = "0.20.0"
 thiserror = "1.0.24"
 anyhow = "1.0.38"
+smallvec = "1.6.1"
 
 [build-dependencies]
 clap = "2.33.3"
@@ -24,6 +25,7 @@ indoc = "1.0.3"
 nix = "0.20.0"
 thiserror = "1.0.24"
 anyhow = "1.0.38"
+smallvec = "1.6.1"
 
 [profile.release]
 lto = true
