@@ -2,8 +2,7 @@ pub mod dtx;
 pub mod perf;
 pub mod status;
 
-use crate::error::Result;
-use clap::{App, AppSettings, Arg};
+use anyhow::Result;
 
 use std::collections::HashMap;
 
@@ -32,7 +31,9 @@ impl Registry {
         }
     }
 
-    pub fn cli(&self) -> App<'static, 'static> {
+    pub fn cli(&self) -> clap::App<'static, 'static> {
+        use clap::{App, AppSettings, Arg};
+
         let settings = [
             AppSettings::ColoredHelp,
             AppSettings::InferSubcommands,

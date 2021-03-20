@@ -1,11 +1,10 @@
-mod error;
 mod cli;
 mod sys;
 
-use crate::error::CliError;
+use anyhow::Result;
 
 
-fn main() -> Result<(), CliError> {
+fn main() -> Result<()> {
     let cmdr = cli::build();
 
     let matches = cmdr.cli().get_matches();

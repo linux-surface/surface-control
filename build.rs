@@ -2,10 +2,6 @@ use std::env;
 use clap::Shell;
 
 #[allow(dead_code)]
-#[path = "src/error.rs"]
-mod error;
-
-#[allow(dead_code)]
 #[path = "src/cli/mod.rs"]
 mod cli;
 

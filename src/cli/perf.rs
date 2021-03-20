@@ -1,6 +1,7 @@
 use crate::cli::Command as DynCommand;
-use crate::error::Result;
 use crate::sys;
+
+use anyhow::{Context, Result};
 
 
 pub struct Command;
@@ -52,10 +53,15 @@ impl Command {
         use clap::value_t_or_exit;
         let mode = value_t_or_exit!(m, "mode", sys::perf::Mode);
 
-        let dev = sys::perf::Device::open()?;
+        let dev = sys::perf::Device::open()
+            .context("Failed to open performance mode device")?;
 
-        if mode != dev.get_mode()? {
-            dev.set_mode(mode)?;
+        let current_mode = dev.get_mode()
+            .context("Failed to get current performance mode")?;
+
+        if mode != current_mode {
+            dev.set_mode(mode)
+                .context("Failed to set performance mode")?;
 
             if !m.is_present("quiet") {
                 println!("Performance-mode set to '{}'", mode);
@@ -69,7 +75,10 @@ impl Command {
     }
 
     fn perf_get(&self, m: &clap::ArgMatches) -> Result<()> {
-        let mode = sys::perf::Device::open()?.get_mode()?;
+        let mode = sys::perf::Device::open()
+            .context("Failed to open performance mode device")?
+            .get_mode()
+            .context("Failed to get current performance mode")?;
 
         if !m.is_present("quiet") {
             println!("Performance-mode is '{}' ({})", mode, mode.short_str());

@@ -1,8 +1,7 @@
-use failure::ResultExt;
-
 use crate::cli::Command as DynCommand;
-use crate::error::{ErrorKind, Result};
 use crate::sys;
+
+use anyhow::{Context, Result};
 
 
 pub struct Command;
@@ -23,15 +22,15 @@ impl DynCommand for Command {
         let opmode = sys::dtx::Device::open().and_then(|d| d.get_opmode());
         let opmode = match opmode {
             Ok(x) => { found = true; Some(x) },
-            Err(ref e) if e.kind() == ErrorKind::DeviceAccess => None,
-            Err(e) => return Err(e),
+            Err(sys::Error::DeviceAccess { .. }) => None,
+            Err(e) => return Err(e).context("Failed to access DTX device"),
         };
 
         let perf_mode = sys::perf::Device::open().and_then(|d| d.get_mode());
         let perf_mode = match perf_mode {
             Ok(x) => { found = true; Some(x) },
-            Err(ref e) if e.kind() == ErrorKind::DeviceAccess => None,
-            Err(e) => return Err(e),
+            Err(sys::Error::DeviceAccess { .. }) => None,
+            Err(e) => return Err(e).context("Failed to access performance mode device"),
         };
 
         if found {
@@ -45,9 +44,7 @@ impl DynCommand for Command {
             Ok(())
 
         } else {
-            Err(failure::err_msg("No surface control device not found"))
-                .context(ErrorKind::DeviceAccess)
-                .map_err(Into::into)
+            anyhow::bail!("No Surface control device found")
         }
     }
 }

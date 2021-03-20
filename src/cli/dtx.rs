@@ -1,6 +1,7 @@
 use crate::cli::Command as DynCommand;
-use crate::error::Result;
 use crate::sys;
+
+use anyhow::{Context, Result};
 
 
 pub struct Command;
@@ -43,7 +44,10 @@ impl DynCommand for Command {
 
 impl Command {
     fn lock(&self, m: &clap::ArgMatches) -> Result<()> {
-        sys::dtx::Device::open()?.latch_lock()?;
+        sys::dtx::Device::open()
+            .context("Failed to open DTX device")?
+            .latch_lock()
+            .context("Failed to lock latch")?;
 
         if !m.is_present("quiet") {
             println!("Clipboard latch locked");
@@ -53,7 +57,10 @@ impl Command {
     }
 
     fn unlock(&self, m: &clap::ArgMatches) -> Result<()> {
-        sys::dtx::Device::open()?.latch_unlock()?;
+        sys::dtx::Device::open()
+            .context("Failed to open DTX device")?
+            .latch_unlock()
+            .context("Failed to unlock latch")?;
 
         if !m.is_present("quiet") {
             println!("Clipboard latch unlocked");
@@ -63,7 +70,10 @@ impl Command {
     }
 
     fn request(&self, m: &clap::ArgMatches) -> Result<()> {
-        sys::dtx::Device::open()?.latch_request()?;
+        sys::dtx::Device::open()
+            .context("Failed to open DTX device")?
+            .latch_request()
+            .context("Failed to send latch request")?;
 
         if !m.is_present("quiet") {
             println!("Clipboard latch request executed");
@@ -73,7 +83,10 @@ impl Command {
     }
 
     fn get_opmode(&self, m: &clap::ArgMatches) -> Result<()> {
-        let opmode = sys::dtx::Device::open()?.get_opmode()?;
+        let opmode = sys::dtx::Device::open()
+            .context("Failed to open DTX device")?
+            .get_opmode()
+            .context("Failed to get device mode")?;
 
         if !m.is_present("quiet") {
             println!("Device is in '{}' mode", opmode);

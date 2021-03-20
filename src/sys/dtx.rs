@@ -4,7 +4,7 @@ use std::os::unix::io::AsRawFd;
 
 use nix::{ioctl_none, ioctl_read};
 
-use crate::error::{Error, ErrorKind, Result, ResultExt};
+use crate::sys::{Error, Result};
 
 
 #[derive(Debug)]
@@ -42,50 +42,40 @@ impl Device {
     }
 
     pub fn open_path<P: AsRef<Path>>(path: P) -> Result<Self> {
-        let result = File::open(path);
-
-        match result {
-            Ok(file) => Ok(Device { file }),
-            Err(ref e) if e.kind() == std::io::ErrorKind::NotFound => {
-                Err(failure::err_msg("Surface DTX device not found"))
-                    .context(ErrorKind::DeviceAccess)
-                    .map_err(Into::into)
-            },
-            Err(e) => {
-                Err(e).context(ErrorKind::DeviceAccess)
-                    .map_err(Into::into)
-            },
-        }
-
+        File::open(path.as_ref())
+            .map_err(|source| Error::DeviceAccess { source, device: path.as_ref().to_owned() })
+            .map(|file| Device { file })
     }
 
     pub fn latch_lock(&self) -> Result<()> {
-        unsafe { dtx_latch_lock(self.file.as_raw_fd()).context(ErrorKind::Io)?; }
-        Ok(())
+        unsafe { dtx_latch_lock(self.file.as_raw_fd()) }
+            .map_err(|source| Error::IoctlError { source })
+            .map(|_| ())
     }
 
     pub fn latch_unlock(&self) -> Result<()> {
-        unsafe { dtx_latch_unlock(self.file.as_raw_fd()).context(ErrorKind::Io)?; }
-        Ok(())
+        unsafe { dtx_latch_unlock(self.file.as_raw_fd()) }
+            .map_err(|source| Error::IoctlError { source })
+            .map(|_| ())
     }
 
     pub fn latch_request(&self) -> Result<()> {
-        unsafe { dtx_latch_request(self.file.as_raw_fd()).context(ErrorKind::Io)?; }
-        Ok(())
+        unsafe { dtx_latch_request(self.file.as_raw_fd()) }
+            .map_err(|source| Error::IoctlError { source })
+            .map(|_| ())
     }
 
     pub fn get_opmode(&self) -> Result<OpMode> {
         let mut opmode: u16 = 0;
-        unsafe {
-            dtx_get_opmode(self.file.as_raw_fd(), &mut opmode as *mut u16)
-                .context(ErrorKind::Io)?;
-        }
+
+        unsafe { dtx_get_opmode(self.file.as_raw_fd(), &mut opmode as *mut u16) }
+            .map_err(|source| Error::IoctlError { source })?;
 
         match opmode {
             0 => Ok(OpMode::Tablet),
             1 => Ok(OpMode::Laptop),
             2 => Ok(OpMode::Studio),
-            _ => Err(Error::from(ErrorKind::InvalidData)),
+            _ => Err(Error::from(Error::InvalidData)),
         }
     }
 }
