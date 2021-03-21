@@ -1,3 +1,11 @@
+surface-control (0.4.0-1) unstable; urgency=medium
+
+  * Update dGPU interface
+  * Add more DTX commands
+  * Restructure status command
+
+ -- Maximilian Luz <luzmaximilian@gmail.com>  Sun, 21 Mar 2021 04:22:33 +0100
+
 surface-control (0.3.1-2) unstable; urgency=medium
 
   * Bump release to build for Fedora 34
