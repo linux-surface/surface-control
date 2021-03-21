@@ -20,6 +20,7 @@ anyhow = "1.0.38"
 smallvec = "1.6.1"
 serde = "1.0.124"
 serde_json = "1.0.64"
+udev = "0.6.0"
 
 [build-dependencies]
 clap = "2.33.3"
@@ -30,6 +31,7 @@ anyhow = "1.0.38"
 smallvec = "1.6.1"
 serde = "1.0.124"
 serde_json = "1.0.64"
+udev = "0.6.0"
 
 [profile.release]
 lto = true

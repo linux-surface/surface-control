@@ -1,4 +1,5 @@
 pub mod dtx;
+pub mod pci;
 pub mod perf;
 
 use thiserror::Error;
@@ -19,6 +20,9 @@ pub enum Error {
 
     #[error("DTX subsystem error")]
     DtxError { source: dtx::DtxError },
+
+    #[error("SysFS error")]
+    SysFsError { source: pci::SysFsError },
 
     #[error("Invalid data")]
     InvalidData,

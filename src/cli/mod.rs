@@ -1,3 +1,4 @@
+pub mod dgpu;
 pub mod dtx;
 pub mod perf;
 pub mod status;
@@ -24,6 +25,7 @@ impl Registry {
             Box::new(status::Command),
             Box::new(perf::Command),
             Box::new(dtx::Command),
+            Box::new(dgpu::Command),
         ];
 
         Registry {
