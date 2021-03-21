@@ -166,33 +166,23 @@ impl Command {
         Ok(())
     }
 
-    fn get_device_mode(&self, m: &clap::ArgMatches) -> Result<()> {
+    fn get_device_mode(&self, _m: &clap::ArgMatches) -> Result<()> {
         let mode = sys::dtx::Device::open()
             .context("Failed to open DTX device")?
             .get_device_mode()
             .context("Failed to get device mode")?;
 
-        if !m.is_present("quiet") {
-            println!("Device is in '{}' mode", mode);
-        } else {
-            println!("{}", mode);
-        }
-
+        println!("{}", mode);
         Ok(())
     }
 
-    fn get_latch_status(&self, m: &clap::ArgMatches) -> Result<()> {
+    fn get_latch_status(&self, _m: &clap::ArgMatches) -> Result<()> {
         let status = sys::dtx::Device::open()
             .context("Failed to open DTX device")?
             .get_latch_status()
             .context("Failed to get latch status")?;
 
-        if !m.is_present("quiet") {
-            println!("Latch has been '{}'", status);
-        } else {
-            println!("{}", status);
-        }
-
+        println!("{}", status);
         Ok(())
     }
 
