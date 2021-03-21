@@ -6,8 +6,8 @@ Summary:    Control various aspects of Microsoft Surface devices from the shell
 License:    MIT
 URL:        https://github.com/linux-surface/surface-control
 
-Requires:       dbus libgcc
-BuildRequires:  rust cargo systemd-rpm-macros
+Requires:       dbus libgcc libudev
+BuildRequires:  rust cargo systemd-rpm-macros libudev-devel
 
 %global debug_package %{nil}
 
