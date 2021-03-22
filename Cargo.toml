@@ -12,25 +12,25 @@ edition = "2018"
 build = "build.rs"
 
 [dependencies]
+anyhow = "1.0.38"
 clap = "2.33.3"
 indoc = "1.0.3"
 nix = "0.20.0"
-thiserror = "1.0.24"
-anyhow = "1.0.38"
-smallvec = "1.6.1"
 serde = "1.0.124"
 serde_json = "1.0.64"
+smallvec = "1.6.1"
+thiserror = "1.0.24"
 udev = "0.6.0"
 
 [build-dependencies]
+anyhow = "1.0.38"
 clap = "2.33.3"
 indoc = "1.0.3"
 nix = "0.20.0"
-thiserror = "1.0.24"
-anyhow = "1.0.38"
-smallvec = "1.6.1"
 serde = "1.0.124"
 serde_json = "1.0.64"
+smallvec = "1.6.1"
+thiserror = "1.0.24"
 udev = "0.6.0"
 
 [profile.release]
