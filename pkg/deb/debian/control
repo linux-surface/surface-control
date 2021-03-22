@@ -6,5 +6,5 @@ Build-Depends: build-essential, debhelper (>= 10), cargo, rustc (>= 1.34.0), lib
 
 Package: surface-control
 Architecture: amd64
-Depends: libc6 (>= 2.19), libgcc1 (>= 1:4.9.2), libudev
+Depends: libc6 (>= 2.19), libgcc1 (>= 1:4.9.2), libudev1
 Description: Control various aspects of Microsoft Surface devices on Linux from the Command-Line

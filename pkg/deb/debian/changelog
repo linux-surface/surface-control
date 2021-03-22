@@ -1,3 +1,9 @@
+surface-control (0.4.0-2) unstable; urgency=medium
+
+  * Fix libudev dependency
+
+ -- Dorian Stoll <dorian.stoll@tmsp.io>  Mon, 22 Mar 2021 15:40:42 +0100
+
 surface-control (0.4.0-1) unstable; urgency=medium
 
   * Update dGPU interface

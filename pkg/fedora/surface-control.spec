@@ -1,13 +1,13 @@
 Name:       surface-control
 Version:    0.4.0
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    Control various aspects of Microsoft Surface devices from the shell
 
 License:    MIT
 URL:        https://github.com/linux-surface/surface-control
 
-Requires:       dbus libgcc libudev
-BuildRequires:  rust cargo systemd-rpm-macros libudev-devel
+Requires:       dbus libgcc systemd-libs
+BuildRequires:  rust cargo systemd-rpm-macros systemd-devel
 
 %global debug_package %{nil}
 
@@ -49,6 +49,9 @@ install -D -m644 "surface-control/target/surface.fish" "%{buildroot}/usr/share/f
 /usr/share/fish/completions/surface.fish
 
 %changelog
+* Mon Mar 22 2021 Dorian Stoll <dorian.stoll@tmsp.io> - 0.4.0-2
+- Fix libudev dependency
+
 * Sun Mar 21 2021 Maximilian Luz <luzmaximilian@gmail.com> - 0.4.0-1
 - Update dGPU interface
 - Add more DTX commands
