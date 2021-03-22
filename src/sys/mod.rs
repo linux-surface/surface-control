@@ -1,4 +1,3 @@
-pub mod dtx;
 pub mod pci;
 pub mod perf;
 
@@ -15,11 +14,8 @@ pub enum Error {
     #[error("I/O error")]
     IoError { source: std::io::Error },
 
-    #[error("I/O error")]
-    IoctlError { source: nix::Error },
-
     #[error("DTX subsystem error")]
-    DtxError { source: dtx::DtxError },
+    DtxError { source: sdtx::ProtocolError },
 
     #[error("SysFS error")]
     SysFsError { source: pci::SysFsError },
@@ -29,3 +25,13 @@ pub enum Error {
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
+
+
+impl From<sdtx::Error> for Error {
+    fn from(err: sdtx::Error) -> Self {
+        match err {
+            sdtx::Error::IoError { source } => Error::IoError { source },
+            sdtx::Error::ProtocolError { source } => Error::DtxError { source },
+        }
+    }
+}

@@ -68,7 +68,7 @@ impl DynCommand for Command {
 
 impl Command {
     fn lock(&self, m: &clap::ArgMatches) -> Result<()> {
-        sys::dtx::Device::open()
+        sdtx::Device::open()
             .context("Failed to open DTX device")?
             .latch_lock()
             .context("Failed to lock latch")?;
@@ -81,7 +81,7 @@ impl Command {
     }
 
     fn unlock(&self, m: &clap::ArgMatches) -> Result<()> {
-        sys::dtx::Device::open()
+        sdtx::Device::open()
             .context("Failed to open DTX device")?
             .latch_unlock()
             .context("Failed to unlock latch")?;
@@ -94,7 +94,7 @@ impl Command {
     }
 
     fn request(&self, m: &clap::ArgMatches) -> Result<()> {
-        sys::dtx::Device::open()
+        sdtx::Device::open()
             .context("Failed to open DTX device")?
             .latch_request()
             .context("Failed to send latch request")?;
@@ -107,7 +107,7 @@ impl Command {
     }
 
     fn confirm(&self, m: &clap::ArgMatches) -> Result<()> {
-        sys::dtx::Device::open()
+        sdtx::Device::open()
             .context("Failed to open DTX device")?
             .latch_confirm()
             .context("Failed to send confirmation")?;
@@ -120,7 +120,7 @@ impl Command {
     }
 
     fn heartbeat(&self, m: &clap::ArgMatches) -> Result<()> {
-        sys::dtx::Device::open()
+        sdtx::Device::open()
             .context("Failed to open DTX device")?
             .latch_heartbeat()
             .context("Failed to send heartbeat")?;
@@ -133,7 +133,7 @@ impl Command {
     }
 
     fn cancel(&self, m: &clap::ArgMatches) -> Result<()> {
-        sys::dtx::Device::open()
+        sdtx::Device::open()
             .context("Failed to open DTX device")?
             .latch_cancel()
             .context("Failed to cancel detachment")?;
@@ -146,7 +146,7 @@ impl Command {
     }
 
     fn get_base_info(&self, m: &clap::ArgMatches) -> Result<()> {
-        let info = sys::dtx::Device::open()
+        let info = sdtx::Device::open()
             .context("Failed to open DTX device")?
             .get_base_info()
             .context("Failed to get base info")?;
@@ -167,7 +167,7 @@ impl Command {
     }
 
     fn get_device_mode(&self, _m: &clap::ArgMatches) -> Result<()> {
-        let mode = sys::dtx::Device::open()
+        let mode = sdtx::Device::open()
             .context("Failed to open DTX device")?
             .get_device_mode()
             .context("Failed to get device mode")?;
@@ -177,7 +177,7 @@ impl Command {
     }
 
     fn get_latch_status(&self, _m: &clap::ArgMatches) -> Result<()> {
-        let status = sys::dtx::Device::open()
+        let status = sdtx::Device::open()
             .context("Failed to open DTX device")?
             .get_latch_status()
             .context("Failed to get latch status")?;
@@ -187,7 +187,7 @@ impl Command {
     }
 
     fn monitor(&self, m: &clap::ArgMatches) -> Result<()> {
-        let mut device = sys::dtx::Device::open()
+        let mut device = sdtx::Device::open()
             .context("Failed to open DTX device")?;
 
         let events = device.events()
@@ -216,7 +216,7 @@ impl Command {
 }
 
 
-struct PrettyBaseInfo(sys::dtx::BaseInfo);
+struct PrettyBaseInfo(sdtx::BaseInfo);
 
 impl serde::Serialize for PrettyBaseInfo {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -228,15 +228,15 @@ impl serde::Serialize for PrettyBaseInfo {
         let mut s = serializer.serialize_struct("BaseInfo", 3)?;
 
         match self.0.state {
-            sys::dtx::BaseState::Attached    => s.serialize_field("state", "attached"),
-            sys::dtx::BaseState::Detached    => s.serialize_field("state", "detached"),
-            sys::dtx::BaseState::NotFeasible => s.serialize_field("state", "not-feasible"),
+            sdtx::BaseState::Attached    => s.serialize_field("state", "attached"),
+            sdtx::BaseState::Detached    => s.serialize_field("state", "detached"),
+            sdtx::BaseState::NotFeasible => s.serialize_field("state", "not-feasible"),
         }?;
 
         match self.0.device_type {
-            sys::dtx::DeviceType::Hid        => s.serialize_field("type", "hid"),
-            sys::dtx::DeviceType::Ssh        => s.serialize_field("type", "ssh"),
-            sys::dtx::DeviceType::Unknown(x) => s.serialize_field("type", &x),
+            sdtx::DeviceType::Hid        => s.serialize_field("type", "hid"),
+            sdtx::DeviceType::Ssh        => s.serialize_field("type", "ssh"),
+            sdtx::DeviceType::Unknown(x) => s.serialize_field("type", &x),
         }?;
 
         s.serialize_field("id", &self.0.id)?;
@@ -245,7 +245,7 @@ impl serde::Serialize for PrettyBaseInfo {
 }
 
 
-struct PrettyEvent(sys::dtx::Event);
+struct PrettyEvent(sdtx::Event);
 
 impl serde::Serialize for PrettyEvent {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -253,8 +253,8 @@ impl serde::Serialize for PrettyEvent {
         S: serde::Serializer
     {
         use serde::ser::SerializeStruct;
-        use sys::dtx::{DeviceType, Event, HardwareError, RuntimeError, uapi};
-        use sys::dtx::event::{BaseState, CancelReason, DeviceMode, LatchStatus};
+        use sdtx::{DeviceType, Event, HardwareError, RuntimeError, uapi};
+        use sdtx::event::{BaseState, CancelReason, DeviceMode, LatchStatus};
 
         match &self.0 {
             Event::Request => {
@@ -357,8 +357,8 @@ impl serde::Serialize for PrettyEvent {
 
 impl std::fmt::Display for PrettyEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use sys::dtx::{DeviceType, Event};
-        use sys::dtx::event::{BaseState, CancelReason, DeviceMode, LatchStatus};
+        use sdtx::{DeviceType, Event};
+        use sdtx::event::{BaseState, CancelReason, DeviceMode, LatchStatus};
 
         match &self.0 {
             Event::Request => {

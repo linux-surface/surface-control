@@ -47,11 +47,11 @@ struct DgpuStats {
 }
 
 struct DtxStats {
-    device_mode:  Option<sys::dtx::DeviceMode>,
-    base_state:   Option<sys::dtx::BaseState>,
-    base_type:    Option<sys::dtx::DeviceType>,
+    device_mode:  Option<sdtx::DeviceMode>,
+    base_state:   Option<sdtx::BaseState>,
+    base_type:    Option<sdtx::DeviceType>,
     base_id:      Option<u8>,
-    latch_status: Option<sys::dtx::LatchStatus>,
+    latch_status: Option<sdtx::LatchStatus>,
 }
 
 
@@ -106,7 +106,7 @@ impl DgpuStats {
 
 impl DtxStats {
     fn load() -> Self {
-        let dev = sys::dtx::Device::open().ok();
+        let dev = sdtx::Device::open().ok();
 
         let base = dev.as_ref().and_then(|d| d.get_base_info().ok());
         let base_state = base.map(|b| b.state);
