@@ -209,7 +209,6 @@ impl PciDevice {
                     Error::IoError { source }
                 }
             })
-
     }
 }
 
