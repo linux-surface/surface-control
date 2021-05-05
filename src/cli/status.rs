@@ -31,12 +31,18 @@ impl DynCommand for Command {
 
 struct Stats {
     perf: PerfStats,
+    prof: ProfileStats,
     dgpu: DgpuStats,
     dtx:  DtxStats,
 }
 
 struct PerfStats {
     mode: Option<sys::perf::Mode>,
+}
+
+struct ProfileStats {
+    current: String,
+    supported: Vec<String>,
 }
 
 struct DgpuStats {
@@ -58,14 +64,16 @@ struct DtxStats {
 impl Stats {
     fn load() -> Self {
         let perf = PerfStats::load();
+        let prof = ProfileStats::load();
         let dgpu = DgpuStats::load();
         let dtx  = DtxStats::load();
 
-        Stats { perf, dgpu, dtx }
+        Stats { perf, prof, dgpu, dtx }
     }
 
     fn available(&self) -> bool {
         self.perf.available()
+            || self.prof.available()
             || self.dgpu.available()
             || self.dtx.available()
     }
@@ -81,6 +89,24 @@ impl PerfStats {
 
     fn available(&self) -> bool {
         self.mode.is_some()
+    }
+}
+
+impl ProfileStats {
+    fn load() -> Self {
+        let dev = sys::profile::Device::open().ok();
+
+        let current = dev.as_ref().and_then(|d| d.get().ok());
+        let supported = dev.as_ref().and_then(|d| d.get_supported().ok());
+
+        ProfileStats {
+            current: current.unwrap_or_else(String::new),
+            supported: supported.unwrap_or_else(Vec::new),
+        }
+    }
+
+    fn available(&self) -> bool {
+        !self.supported.is_empty() && !self.current.is_empty()
     }
 }
 
@@ -137,7 +163,7 @@ impl DtxStats {
 
 impl std::fmt::Display for Stats {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{}{}", self.perf, self.dgpu, self.dtx)
+        write!(f, "{}{}{}{}", self.perf, self.prof, self.dgpu, self.dtx)
     }
 }
 
@@ -148,6 +174,31 @@ impl std::fmt::Display for PerfStats {
         } else {
             Ok(())
         }
+    }
+}
+
+impl std::fmt::Display for ProfileStats {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if !self.available() {
+            return Ok(());
+        }
+
+        let mut profiles = String::new();
+        for (i, profile) in self.supported.iter().enumerate() {
+            if i > 0 {
+                profiles += " ";
+            }
+
+            if *profile == self.current {
+                profiles += "[";
+                profiles += &profile;
+                profiles += "]";
+            } else {
+                profiles += &profile;
+            }
+        }
+
+        writeln!(f, "Platform Profile: {}\n", profiles)
     }
 }
 
