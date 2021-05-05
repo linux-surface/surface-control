@@ -1,5 +1,6 @@
 pub mod pci;
 pub mod perf;
+pub mod profile;
 
 use thiserror::Error;
 

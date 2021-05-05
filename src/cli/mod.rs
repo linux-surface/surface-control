@@ -1,6 +1,7 @@
 pub mod dgpu;
 pub mod dtx;
 pub mod perf;
+pub mod profile;
 pub mod status;
 
 use anyhow::Result;
@@ -24,6 +25,7 @@ impl Registry {
         let list: Vec<Box<dyn Command>> = vec![
             Box::new(status::Command),
             Box::new(perf::Command),
+            Box::new(profile::Command),
             Box::new(dtx::Command),
             Box::new(dgpu::Command),
         ];
