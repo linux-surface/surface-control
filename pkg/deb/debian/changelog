@@ -1,3 +1,9 @@
+surface-control (0.4.1-1) unstable; urgency=medium
+
+  * Add interface for platform profile
+
+ -- Maximilian Luz <luzmn@xws.localdomain>  Wed, 05 May 2021 17:54:36 +0200
+
 surface-control (0.4.0-2) unstable; urgency=medium
 
   * Fix libudev dependency
