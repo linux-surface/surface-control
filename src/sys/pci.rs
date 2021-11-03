@@ -103,7 +103,7 @@ impl RuntimePowerManagement {
         }
     }
 
-    fn to_sysfs(&self) -> &'static str {
+    fn as_sysfs(&self) -> &'static str {
         match self {
             Self::On  => "auto",
             Self::Off => "on",
@@ -200,7 +200,7 @@ impl PciDevice {
     }
 
     pub fn set_runtime_pm(&mut self, state: RuntimePowerManagement) -> Result<()> {
-        self.base.set_attribute_value("power/control", state.to_sysfs())
+        self.base.set_attribute_value("power/control", state.as_sysfs())
             .map_err(|source| {
                 // WORKAROUND: Someone didn't invert the errno in the udev crate...
                 if let Some(errno) = source.raw_os_error()  {
