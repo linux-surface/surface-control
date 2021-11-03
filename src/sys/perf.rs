@@ -97,7 +97,7 @@ impl Device {
         let mut buf = [0; 4];
         let len = file
             .read(&mut buf)
-            .map_err(|source| Error::IoError { source })?;
+            .map_err(|source| Error::Io { source })?;
         let len = std::cmp::min(len + 1, buf.len());
 
         let state = std::ffi::CStr::from_bytes_with_nul(&buf[0..len])
@@ -124,14 +124,14 @@ impl Device {
 
         let len = file
             .write(mode)
-            .map_err(|source| Error::IoError { source })?;
+            .map_err(|source| Error::Io { source })?;
 
         if len == mode.len() {
             Ok(())
         } else {
             use std::io;
 
-            Err(Error::IoError {
+            Err(Error::Io {
                 source: io::Error::new(io::ErrorKind::WriteZero, "Write failed"),
             })
         }

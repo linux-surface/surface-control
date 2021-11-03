@@ -197,7 +197,7 @@ impl Command {
 
         for event in events {
             let event = event
-                .map_err(|source| sys::Error::IoError { source })
+                .map_err(|source| sys::Error::Io { source })
                 .context("Error reading event")?;
 
             if !quiet {

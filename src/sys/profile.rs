@@ -43,7 +43,7 @@ impl Device {
 
         let mut profile = String::new();
         file.read_to_string(&mut profile)
-            .map_err(|e| Error::IoError { source: e })?;
+            .map_err(|e| Error::Io { source: e })?;
 
         Ok(profile.trim().to_owned())
     }
@@ -60,7 +60,7 @@ impl Device {
             })?;
 
         file.write(profile.as_bytes())
-            .map_err(|e| Error::IoError { source: e })?;
+            .map_err(|e| Error::Io { source: e })?;
 
         Ok(())
     }
@@ -78,7 +78,7 @@ impl Device {
 
         let mut supported = String::new();
         file.read_to_string(&mut supported)
-            .map_err(|e| Error::IoError { source: e })?;
+            .map_err(|e| Error::Io { source: e })?;
 
         let supported = supported.split_ascii_whitespace()
             .map(|s| s.trim().to_owned())

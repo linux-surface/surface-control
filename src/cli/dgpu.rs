@@ -123,27 +123,27 @@ impl Command {
 
 pub fn find_dgpu_device() -> crate::sys::Result<Option<PciDevice>> {
     let mut enumerator = udev::Enumerator::new()
-        .map_err(|source| Error::IoError { source })?;
+        .map_err(|source| Error::Io { source })?;
 
     enumerator.match_subsystem("pci")
-        .map_err(|source| Error::IoError { source })?;
+        .map_err(|source| Error::Io { source })?;
 
     let devices = enumerator.scan_devices()
-        .map_err(|source| Error::IoError { source })?;
+        .map_err(|source| Error::Io { source })?;
 
     for device in devices {
         let device = PciDevice::try_from(device)
-            .map_err(|source| Error::SysFsError { source })?;
+            .map_err(|source| Error::SysFs { source })?;
 
         let vendor_id = device.vendor_id()
-            .map_err(|source| Error::SysFsError { source })?;
+            .map_err(|source| Error::SysFs { source })?;
 
         if vendor_id != sys::pci::VENDOR_ID_NVIDIA {
             continue;
         }
 
         let class = device.class()
-            .map_err(|source| Error::SysFsError { source })?;
+            .map_err(|source| Error::SysFs { source })?;
 
         if class.base != sys::pci::BASE_CLASS_DISPLAY {
             continue;

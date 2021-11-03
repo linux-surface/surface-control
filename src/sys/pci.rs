@@ -204,9 +204,9 @@ impl PciDevice {
             .map_err(|source| {
                 // WORKAROUND: Someone didn't invert the errno in the udev crate...
                 if let Some(errno) = source.raw_os_error()  {
-                    Error::IoError { source: std::io::Error::from_raw_os_error(-errno) }
+                    Error::Io { source: std::io::Error::from_raw_os_error(-errno) }
                 } else {
-                    Error::IoError { source }
+                    Error::Io { source }
                 }
             })
     }

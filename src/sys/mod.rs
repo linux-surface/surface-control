@@ -13,13 +13,13 @@ pub enum Error {
     DeviceAccess { source: std::io::Error, device: PathBuf },
 
     #[error("I/O error")]
-    IoError { source: std::io::Error },
+    Io { source: std::io::Error },
 
     #[error("DTX subsystem error")]
-    DtxError { source: sdtx::ProtocolError },
+    Dtx { source: sdtx::ProtocolError },
 
     #[error("SysFS error")]
-    SysFsError { source: pci::SysFsError },
+    SysFs { source: pci::SysFsError },
 
     #[error("Invalid data")]
     InvalidData,
@@ -31,8 +31,8 @@ pub type Result<T> = std::result::Result<T, Error>;
 impl From<sdtx::Error> for Error {
     fn from(err: sdtx::Error) -> Self {
         match err {
-            sdtx::Error::IoError { source } => Error::IoError { source },
-            sdtx::Error::ProtocolError { source } => Error::DtxError { source },
+            sdtx::Error::IoError { source } => Error::Io { source },
+            sdtx::Error::ProtocolError { source } => Error::Dtx { source },
         }
     }
 }
