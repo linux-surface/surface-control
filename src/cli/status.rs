@@ -191,10 +191,10 @@ impl std::fmt::Display for ProfileStats {
 
             if *profile == self.current {
                 profiles += "[";
-                profiles += &profile;
+                profiles += profile;
                 profiles += "]";
             } else {
-                profiles += &profile;
+                profiles += profile;
             }
         }
 
