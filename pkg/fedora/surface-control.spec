@@ -1,6 +1,6 @@
 Name:       surface-control
 Version:    0.4.1
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    Control various aspects of Microsoft Surface devices from the shell
 
 License:    MIT
@@ -49,6 +49,9 @@ install -D -m644 "surface-control/target/surface.fish" "%{buildroot}/usr/share/f
 /usr/share/fish/completions/surface.fish
 
 %changelog
+* Wed Nov 03 2021 Dorian Stoll <dorian.stoll@tmsp.io> - 0.4.1-2
+- Bump release to build for Fedora 35
+
 * Wed May 06 2021 Maximilian Luz <luzmaximilian@gmail.com> - 0.4.1-1
 - Add interface for platform profile
 
