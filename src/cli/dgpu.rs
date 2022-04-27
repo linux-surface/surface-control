@@ -14,29 +14,30 @@ impl DynCommand for Command {
         "dgpu"
     }
 
-    fn build(&self) -> clap::App<'static, 'static> {
-        use clap::{AppSettings, Arg, SubCommand};
+    fn build(&self) -> clap::Command {
+        use clap::Arg;
 
-        clap::SubCommand::with_name(self.name())
+        clap::Command::new(self.name())
             .about("Control the discrete GPU")
-            .setting(AppSettings::SubcommandRequiredElseHelp)
-            .setting(AppSettings::InferSubcommands)
-            .subcommand(SubCommand::with_name("id")
+            .subcommand_required(true)
+            .arg_required_else_help(true)
+            .infer_subcommands(true)
+            .subcommand(clap::Command::new("id")
                 .alias("get-id")
                 .about("Get the dGPU PCI device ID")
                 .display_order(1))
-            .subcommand(SubCommand::with_name("get-power-state")
+            .subcommand(clap::Command::new("get-power-state")
                 .aliases(&["ps", "get-ps", "power-state"])
                 .about("Get the dGPU PCI power state")
                 .display_order(2))
-            .subcommand(SubCommand::with_name("get-runtime-pm")
+            .subcommand(clap::Command::new("get-runtime-pm")
                 .aliases(&["rpm", "get-rpm"])
                 .about("Get the dGPU runtime PM control")
                 .display_order(3))
-            .subcommand(SubCommand::with_name("set-runtime-pm")
+            .subcommand(clap::Command::new("set-runtime-pm")
                 .alias("set-rpm")
                 .about("Set the dGPU runtime PM control")
-                .arg(Arg::with_name("mode")
+                .arg(Arg::new("mode")
                     .possible_values(&["on", "off"])
                     .required(true)
                     .index(1))
@@ -45,10 +46,10 @@ impl DynCommand for Command {
 
     fn execute(&self, m: &clap::ArgMatches) -> Result<()> {
         match m.subcommand() {
-            ("id",              Some(m)) => self.get_id(m),
-            ("get-power-state", Some(m)) => self.get_power_state(m),
-            ("get-runtime-pm",  Some(m)) => self.get_runtime_pm(m),
-            ("set-runtime-pm",  Some(m)) => self.set_runtime_pm(m),
+            Some(("id",              m)) => self.get_id(m),
+            Some(("get-power-state", m)) => self.get_power_state(m),
+            Some(("get-runtime-pm",  m)) => self.get_runtime_pm(m),
+            Some(("set-runtime-pm",  m)) => self.set_runtime_pm(m),
             _                            => unreachable!(),
         }
     }
@@ -103,8 +104,7 @@ impl Command {
     }
 
     fn set_runtime_pm(&self, m: &clap::ArgMatches) -> Result<()> {
-        use clap::value_t_or_exit;
-        let mode = value_t_or_exit!(m, "mode", sys::pci::RuntimePowerManagement);
+        let mode: sys::pci::RuntimePowerManagement = m.value_of_t_or_exit("mode");
 
         let mut dgpu = find_dgpu_device()
             .context("Failed to look up discrete GPU device")?

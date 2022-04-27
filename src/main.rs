@@ -9,7 +9,7 @@ fn main() -> Result<()> {
 
     let matches = cmdr.cli().get_matches();
     match matches.subcommand() {
-        (cmd, Some(m)) => cmdr.execute(cmd, m)?,
+        Some((cmd, m)) => cmdr.execute(cmd, m)?,
         _              => unreachable!(),
     }
 

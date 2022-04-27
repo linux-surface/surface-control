@@ -11,8 +11,8 @@ impl DynCommand for Command {
         "status"
     }
 
-    fn build(&self) -> clap::App<'static, 'static> {
-        clap::SubCommand::with_name(self.name())
+    fn build(&self) -> clap::Command {
+        clap::Command::new(self.name())
             .about("Show an overview of the current system status")
     }
 

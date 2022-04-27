@@ -59,6 +59,13 @@ impl std::str::FromStr for Mode {
     }
 }
 
+impl std::fmt::Display for InvalidPerformanceModeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Invalid performance mode")
+    }
+}
+
+
 pub struct Device {
     path: PathBuf,
 }

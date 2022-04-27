@@ -11,28 +11,30 @@ impl DynCommand for Command {
         "profile"
     }
 
-    fn build(&self) -> clap::App<'static, 'static> {
-        use clap::{AppSettings, Arg, SubCommand};
+    fn build(&self) -> clap::Command {
+        use clap::Arg;
 
-        SubCommand::with_name(self.name())
+        clap::Command::new(self.name())
             .about("Control or query the current platform profile")
-            .setting(AppSettings::SubcommandRequiredElseHelp)
-            .subcommand(SubCommand::with_name("set")
+            .subcommand_required(true)
+            .arg_required_else_help(true)
+            .infer_subcommands(true)
+            .subcommand(clap::Command::new("set")
                 .about("Set the current platform profile")
-                .arg(Arg::with_name("profile")
+                .arg(Arg::new("profile")
                     .required(true)
                     .index(1)))
-            .subcommand(SubCommand::with_name("get")
+            .subcommand(clap::Command::new("get")
                 .about("Get the current platform profile"))
-            .subcommand(SubCommand::with_name("list")
+            .subcommand(clap::Command::new("list")
                 .about("List all available platform profiles"))
     }
 
     fn execute(&self, m: &clap::ArgMatches) -> Result<()> {
         match m.subcommand() {
-            ("set", Some(m))  => self.profile_set(m),
-            ("get", Some(m))  => self.profile_get(m),
-            ("list", Some(m)) => self.profile_list(m),
+            Some(("set",  m))  => self.profile_set(m),
+            Some(("get",  m))  => self.profile_get(m),
+            Some(("list", m)) => self.profile_list(m),
             _                => unreachable!(),
         }
     }

@@ -11,10 +11,10 @@ impl DynCommand for Command {
         "performance"
     }
 
-    fn build(&self) -> clap::App<'static, 'static> {
-        use clap::{AppSettings, Arg, SubCommand};
+    fn build(&self) -> clap::Command {
+        use clap::Arg;
 
-        SubCommand::with_name(self.name())
+        clap::Command::new(self.name())
             .about("Control or query the current performance-mode")
             .long_about(indoc::indoc!("
                 Control or query the current performance-mode
@@ -28,21 +28,23 @@ impl DynCommand for Command {
                         3  Better Performance
                         4  Best Performance
                 "))
-            .setting(AppSettings::SubcommandRequiredElseHelp)
-            .subcommand(SubCommand::with_name("set")
+            .subcommand_required(true)
+            .arg_required_else_help(true)
+            .infer_subcommands(true)
+            .subcommand(clap::Command::new("set")
                 .about("Set the current performance-mode")
-                .arg(Arg::with_name("mode")
+                .arg(Arg::new("mode")
                     .possible_values(&["1", "2", "3", "4"])
                     .required(true)
                     .index(1)))
-            .subcommand(SubCommand::with_name("get")
+            .subcommand(clap::Command::new("get")
                 .about("Get the current performance-mode"))
     }
 
     fn execute(&self, m: &clap::ArgMatches) -> Result<()> {
         match m.subcommand() {
-            ("set", Some(m)) => self.perf_set(m),
-            ("get", Some(m)) => self.perf_get(m),
+            Some(("set", m)) => self.perf_set(m),
+            Some(("get", m)) => self.perf_get(m),
             _                => unreachable!(),
         }
     }
@@ -50,8 +52,7 @@ impl DynCommand for Command {
 
 impl Command {
     fn perf_set(&self, m: &clap::ArgMatches) -> Result<()> {
-        use clap::value_t_or_exit;
-        let mode = value_t_or_exit!(m, "mode", sys::perf::Mode);
+        let mode: sys::perf::Mode = m.value_of_t_or_exit("mode");
 
         let dev = sys::perf::Device::open()
             .context("Failed to open performance mode device")?;

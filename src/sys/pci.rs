@@ -126,6 +126,12 @@ impl FromStr for RuntimePowerManagement {
     }
 }
 
+impl std::fmt::Display for InvalidRuntimePmError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Invalid runtime power-management specifier")
+    }
+}
+
 
 pub struct PciDevice {
     base: udev::Device,

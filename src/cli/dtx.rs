@@ -11,56 +11,56 @@ impl DynCommand for Command {
         "dtx"
     }
 
-    fn build(&self) -> clap::App<'static, 'static> {
-        use clap::{AppSettings, SubCommand};
-
-        SubCommand::with_name(self.name())
+    fn build(&self) -> clap::Command {
+        clap::Command::new(self.name())
             .about("Control the latch/dtx-system on the Surface Book 2")
-            .setting(AppSettings::SubcommandRequiredElseHelp)
-            .subcommand(SubCommand::with_name("lock")
+            .subcommand_required(true)
+            .arg_required_else_help(true)
+            .infer_subcommands(true)
+            .subcommand(clap::Command::new("lock")
                 .about("Lock the latch")
                 .display_order(1))
-            .subcommand(SubCommand::with_name("unlock")
+            .subcommand(clap::Command::new("unlock")
                 .about("Unlock the latch")
                 .display_order(2))
-            .subcommand(SubCommand::with_name("request")
+            .subcommand(clap::Command::new("request")
                 .about("Request latch-open or abort if already in progress")
                 .display_order(3))
-            .subcommand(SubCommand::with_name("confirm")
+            .subcommand(clap::Command::new("confirm")
                 .about("Confirm latch-open if detachment in progress")
                 .display_order(4))
-            .subcommand(SubCommand::with_name("heartbeat")
+            .subcommand(clap::Command::new("heartbeat")
                 .about("Send heartbeat if detachment in progress")
                 .display_order(5))
-            .subcommand(SubCommand::with_name("cancel")
+            .subcommand(clap::Command::new("cancel")
                 .about("Cancel any detachment in progress")
                 .display_order(6))
-            .subcommand(SubCommand::with_name("get-base")
+            .subcommand(clap::Command::new("get-base")
                 .about("Get information about the currently attached base")
                 .display_order(7))
-            .subcommand(SubCommand::with_name("get-devicemode")
+            .subcommand(clap::Command::new("get-devicemode")
                 .about("Query the current device operation mode")
                 .display_order(8))
-            .subcommand(SubCommand::with_name("get-latchstatus")
+            .subcommand(clap::Command::new("get-latchstatus")
                 .about("Query the current latch status")
                 .display_order(9))
-            .subcommand(SubCommand::with_name("monitor")
+            .subcommand(clap::Command::new("monitor")
                 .about("Monitor DTX events")
                 .display_order(10))
     }
 
     fn execute(&self, m: &clap::ArgMatches) -> Result<()> {
         match m.subcommand() {
-            ("lock",            Some(m)) => self.lock(m),
-            ("unlock",          Some(m)) => self.unlock(m),
-            ("request",         Some(m)) => self.request(m),
-            ("confirm",         Some(m)) => self.confirm(m),
-            ("heartbeat",       Some(m)) => self.heartbeat(m),
-            ("cancel",          Some(m)) => self.cancel(m),
-            ("get-base",        Some(m)) => self.get_base_info(m),
-            ("get-devicemode",  Some(m)) => self.get_device_mode(m),
-            ("get-latchstatus", Some(m)) => self.get_latch_status(m),
-            ("monitor",         Some(m)) => self.monitor(m),
+            Some(("lock",            m)) => self.lock(m),
+            Some(("unlock",          m)) => self.unlock(m),
+            Some(("request",         m)) => self.request(m),
+            Some(("confirm",         m)) => self.confirm(m),
+            Some(("heartbeat",       m)) => self.heartbeat(m),
+            Some(("cancel",          m)) => self.cancel(m),
+            Some(("get-base",        m)) => self.get_base_info(m),
+            Some(("get-devicemode",  m)) => self.get_device_mode(m),
+            Some(("get-latchstatus", m)) => self.get_latch_status(m),
+            Some(("monitor",         m)) => self.monitor(m),
             _                            => unreachable!(),
         }
     }

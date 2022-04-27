@@ -1,5 +1,5 @@
 use std::env;
-use clap::Shell;
+use clap_complete::shells;
 
 #[allow(dead_code)]
 #[path = "src/cli/mod.rs"]
@@ -15,8 +15,10 @@ fn main() {
         .or_else(|| env::var_os("OUT_DIR"))
         .unwrap();
 
-    let mut app = cli::build().cli();
-    app.gen_completions("surface", Shell::Bash, &outdir);
-    app.gen_completions("surface", Shell::Zsh,  &outdir);
-    app.gen_completions("surface", Shell::Fish, &outdir);
+    let reg = cli::build();
+    let mut app = reg.cli();
+
+    clap_complete::generate_to(shells::Bash, &mut app, "surface", &outdir).unwrap();
+    clap_complete::generate_to(shells::Zsh, &mut app, "surface", &outdir).unwrap();
+    clap_complete::generate_to(shells::Fish, &mut app, "surface", &outdir).unwrap();
 }

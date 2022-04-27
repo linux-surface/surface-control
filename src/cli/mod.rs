@@ -11,7 +11,7 @@ use std::collections::HashMap;
 
 pub trait Command {
     fn name(&self) -> &'static str;
-    fn build(&self) -> clap::App<'static, 'static>;
+    fn build(&self) -> clap::Command;
     fn execute(&self, matches: &clap::ArgMatches) -> Result<()>;
 }
 
@@ -35,24 +35,17 @@ impl Registry {
         }
     }
 
-    pub fn cli(&self) -> clap::App<'static, 'static> {
-        use clap::{App, AppSettings, Arg};
+    pub fn cli(&self) -> clap::Command {
+        use clap::Arg;
 
-        let settings = [
-            AppSettings::ColoredHelp,
-            AppSettings::InferSubcommands,
-            AppSettings::VersionlessSubcommands,
-        ];
-
-        let mut app = App::new(clap::crate_name!())
-            .version(clap::crate_version!())
-            .author(clap::crate_authors!())
+        let mut app = clap::command!()
             .about("Control various aspects of Microsoft Surface devices")
-            .setting(AppSettings::SubcommandRequiredElseHelp)
-            .global_settings(&settings)
-            .arg(Arg::with_name("quiet")
+            .subcommand_required(true)
+            .arg_required_else_help(true)
+            .infer_subcommands(true)
+            .arg(Arg::new("quiet")
                 .help("Keep output quiet")
-                .short("q")
+                .short('q')
                 .long("quiet")
                 .global(true));
 
