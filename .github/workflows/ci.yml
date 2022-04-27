@@ -300,11 +300,6 @@ jobs:
       with:
         name: fedora-34-latest
 
-    - name: Download Fedora 33 artifacts
-      uses: actions/download-artifact@v1
-      with:
-        name: fedora-33-latest
-
     - name: Upload assets
       uses: svenstaro/upload-release-action@v1-release
       with:
