@@ -100,8 +100,8 @@ impl ProfileStats {
         let supported = dev.as_ref().and_then(|d| d.get_supported().ok());
 
         ProfileStats {
-            current: current.unwrap_or_else(String::new),
-            supported: supported.unwrap_or_else(Vec::new),
+            current: current.unwrap_or_default(),
+            supported: supported.unwrap_or_default(),
         }
     }
 
