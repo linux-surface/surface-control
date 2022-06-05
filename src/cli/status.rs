@@ -30,14 +30,9 @@ impl DynCommand for Command {
 
 
 struct Stats {
-    perf: PerfStats,
     prof: ProfileStats,
     dgpu: DgpuStats,
     dtx:  DtxStats,
-}
-
-struct PerfStats {
-    mode: Option<sys::perf::Mode>,
 }
 
 struct ProfileStats {
@@ -63,32 +58,17 @@ struct DtxStats {
 
 impl Stats {
     fn load() -> Self {
-        let perf = PerfStats::load();
         let prof = ProfileStats::load();
         let dgpu = DgpuStats::load();
         let dtx  = DtxStats::load();
 
-        Stats { perf, prof, dgpu, dtx }
+        Stats { prof, dgpu, dtx }
     }
 
     fn available(&self) -> bool {
-        self.perf.available()
-            || self.prof.available()
+        self.prof.available()
             || self.dgpu.available()
             || self.dtx.available()
-    }
-}
-
-impl PerfStats {
-    fn load() -> Self {
-        let mode = sys::perf::Device::open().ok()
-            .and_then(|device| device.get_mode().ok());
-
-        PerfStats { mode }
-    }
-
-    fn available(&self) -> bool {
-        self.mode.is_some()
     }
 }
 
@@ -163,17 +143,7 @@ impl DtxStats {
 
 impl std::fmt::Display for Stats {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{}{}{}", self.perf, self.prof, self.dgpu, self.dtx)
-    }
-}
-
-impl std::fmt::Display for PerfStats {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if let Some(mode) = self.mode {
-            writeln!(f, "Performance Mode: {}\n", mode)
-        } else {
-            Ok(())
-        }
+        write!(f, "{}{}{}", self.prof, self.dgpu, self.dtx)
     }
 }
 

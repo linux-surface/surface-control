@@ -1,6 +1,5 @@
 pub mod dgpu;
 pub mod dtx;
-pub mod perf;
 pub mod profile;
 pub mod status;
 
@@ -24,7 +23,6 @@ impl Registry {
     pub fn build() -> Self {
         let list: Vec<Box<dyn Command>> = vec![
             Box::new(status::Command),
-            Box::new(perf::Command),
             Box::new(profile::Command),
             Box::new(dtx::Command),
             Box::new(dgpu::Command),

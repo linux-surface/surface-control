@@ -1,5 +1,4 @@
 pub mod pci;
-pub mod perf;
 pub mod profile;
 
 use thiserror::Error;
@@ -20,9 +19,6 @@ pub enum Error {
 
     #[error("SysFS error")]
     SysFs { source: pci::SysFsError },
-
-    #[error("Invalid data")]
-    InvalidData,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
