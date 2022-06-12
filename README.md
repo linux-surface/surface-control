@@ -20,7 +20,6 @@ SUBCOMMANDS:
     dgpu           Control the discrete GPU
     dtx            Control the latch/dtx-system on the Surface Book 2
     help           Prints this message or the help of the given subcommand(s)
-    performance    Control or query the current performance-mode
     profile        Control or query the current platform profile
     status         Show an overview of the current system status
 ```
