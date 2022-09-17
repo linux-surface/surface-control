@@ -1,5 +1,5 @@
 Name:       surface-control
-Version:    0.4.2
+Version:    0.4.3
 Release:    1%{?dist}
 Summary:    Control various aspects of Microsoft Surface devices from the shell
 
@@ -49,6 +49,10 @@ install -D -m644 "surface-control/target/surface.fish" "%{buildroot}/usr/share/f
 /usr/share/fish/completions/surface.fish
 
 %changelog
+* Sat Sep 17 2022 Maximilian Luz <luzmaximilian@gmail.com> - 0.4.3-1
+- Remove outdated performance-mode command
+- Update dependencies
+
 * Thu Apr 28 2022 Maximilian Luz <luzmaximilian@gmail.com> - 0.4.2-1
 - Update dependencies
 
