@@ -20,7 +20,7 @@ impl DynCommand for Command {
         let stats = Stats::load();
 
         if stats.available() {
-            print!("{}", stats);
+            print!("{stats}");
             Ok(())
         } else {
             anyhow::bail!("No devices found")
@@ -168,7 +168,7 @@ impl std::fmt::Display for ProfileStats {
             }
         }
 
-        writeln!(f, "Platform Profile: {}\n", profiles)
+        writeln!(f, "Platform Profile: {profiles}\n")
     }
 }
 
@@ -181,16 +181,16 @@ impl std::fmt::Display for DgpuStats {
         writeln!(f, "Discrete GPU:")?;
 
         if let Some(vendor) = self.vendor {
-            writeln!(f, "  Vendor:         {:04x}", vendor)?;
+            writeln!(f, "  Vendor:         {vendor:04x}")?;
         }
         if let Some(device) = self.device {
-            writeln!(f, "  Device:         {:04x}", device)?;
+            writeln!(f, "  Device:         {device:04x}")?;
         }
         if let Some(power_state) = self.power_state {
-            writeln!(f, "  Power State:    {}", power_state)?;
+            writeln!(f, "  Power State:    {power_state}")?;
         }
         if let Some(runtime_pm) = self.runtime_pm {
-            writeln!(f, "  Runtime PM:     {}", runtime_pm)?;
+            writeln!(f, "  Runtime PM:     {runtime_pm}")?;
         }
 
         writeln!(f)
@@ -206,19 +206,19 @@ impl std::fmt::Display for DtxStats {
         writeln!(f, "DTX:")?;
 
         if let Some(device_mode) = self.device_mode {
-            writeln!(f, "  Device Mode:    {}", device_mode)?;
+            writeln!(f, "  Device Mode:    {device_mode}")?;
         }
         if let Some(base_state) = self.base_state {
-            writeln!(f, "  Base State:     {}", base_state)?;
+            writeln!(f, "  Base State:     {base_state}")?;
         }
         if let Some(base_type) = self.base_type {
-            writeln!(f, "  Base Type:      {}", base_type)?;
+            writeln!(f, "  Base Type:      {base_type}")?;
         }
         if let Some(base_id) = self.base_id {
-            writeln!(f, "  Base ID:        {:#04x}", base_id)?;
+            writeln!(f, "  Base ID:        {base_id:#04x}")?;
         }
         if let Some(latch_status) = self.latch_status {
-            writeln!(f, "  Latch Status:   {}", latch_status)?;
+            writeln!(f, "  Latch Status:   {latch_status}")?;
         }
 
         writeln!(f)

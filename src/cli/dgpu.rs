@@ -38,7 +38,7 @@ impl DynCommand for Command {
                 .alias("set-rpm")
                 .about("Set the dGPU runtime PM control")
                 .arg(Arg::new("mode")
-                    .possible_values(&["on", "off"])
+                    .possible_values(["on", "off"])
                     .required(true)
                     .index(1))
                 .display_order(4))
@@ -68,10 +68,10 @@ impl Command {
             .context("Failed to get device ID")?;
 
         if !m.is_present("quiet") {
-            println!("Vendor: {:04x}", vendor_id);
-            println!("Device: {:04x}", device_id);
+            println!("Vendor: {vendor_id:04x}");
+            println!("Device: {device_id:04x}");
         } else {
-            println!("{:04x}:{:04x}", vendor_id, device_id);
+            println!("{vendor_id:04x}:{device_id:04x}");
         }
 
         Ok(())
@@ -85,7 +85,7 @@ impl Command {
         let pstate = dgpu.get_power_state()
             .context("Failed to get device power state")?;
 
-         println!("{}", pstate);
+         println!("{pstate}");
 
         Ok(())
     }
@@ -98,7 +98,7 @@ impl Command {
         let mode = dgpu.get_runtime_pm()
             .context("Failed to get runtime PM mode")?;
 
-        println!("{}", mode);
+        println!("{mode}");
 
         Ok(())
     }
@@ -114,7 +114,7 @@ impl Command {
             .context("Failed to set runtime PM mode")?;
 
         if !m.is_present("quiet") {
-            println!("Discrete GPU runtime PM set to '{}'", mode);
+            println!("Discrete GPU runtime PM set to '{mode}'");
         }
 
         Ok(())

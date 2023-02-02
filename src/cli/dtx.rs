@@ -160,7 +160,7 @@ impl Command {
             let text = serde_json::to_string(&PrettyBaseInfo(info))
                 .context("Failed to serialize data")?;
 
-            println!("{}", text);
+            println!("{text}");
         }
 
         Ok(())
@@ -172,7 +172,7 @@ impl Command {
             .get_device_mode()
             .context("Failed to get device mode")?;
 
-        println!("{}", mode);
+        println!("{mode}");
         Ok(())
     }
 
@@ -182,7 +182,7 @@ impl Command {
             .get_latch_status()
             .context("Failed to get latch status")?;
 
-        println!("{}", status);
+        println!("{status}");
         Ok(())
     }
 
@@ -207,7 +207,7 @@ impl Command {
                 let text = serde_json::to_string(&PrettyEvent(event))
                     .context("Failed to serialize data")?;
 
-                println!("{}", text);
+                println!("{text}");
             }
         }
 
@@ -369,9 +369,9 @@ impl std::fmt::Display for PrettyEvent {
                 write!(f, "Cancel         {{ Reason: ")?;
 
                 match reason {
-                    CancelReason::Hardware(err) => write!(f, "\"{}\"", err),
-                    CancelReason::Runtime(err)  => write!(f, "\"{}\"", err),
-                    CancelReason::Unknown(err)  => write!(f, "{:#04x}", err),
+                    CancelReason::Hardware(err) => write!(f, "\"{err}\""),
+                    CancelReason::Runtime(err)  => write!(f, "\"{err}\""),
+                    CancelReason::Unknown(err)  => write!(f, "{err:#04x}"),
                 }?;
 
                 write!(f, " }}")
@@ -384,7 +384,7 @@ impl std::fmt::Display for PrettyEvent {
                     BaseState::Detached    => write!(f, "Detached"),
                     BaseState::Attached    => write!(f, "Attached"),
                     BaseState::NotFeasible => write!(f, "NotFeasible"),
-                    BaseState::Unknown(x)  => write!(f, "{:#04x}", x),
+                    BaseState::Unknown(x)  => write!(f, "{x:#04x}"),
                 }?;
 
                 write!(f, ", DeviceType: ")?;
@@ -392,10 +392,10 @@ impl std::fmt::Display for PrettyEvent {
                 match device_type {
                     DeviceType::Hid        => write!(f, "Hid"),
                     DeviceType::Ssh        => write!(f, "Ssh"),
-                    DeviceType::Unknown(x) => write!(f, "{:#04x}", x),
+                    DeviceType::Unknown(x) => write!(f, "{x:#04x}"),
                 }?;
 
-                write!(f, ", Id: {:#04x} }}", id)
+                write!(f, ", Id: {id:#04x} }}")
             },
 
             Event::LatchStatus { status } => {
@@ -404,8 +404,8 @@ impl std::fmt::Display for PrettyEvent {
                 match status {
                     LatchStatus::Closed     => write!(f, "Closed"),
                     LatchStatus::Opened     => write!(f, "Opened"),
-                    LatchStatus::Error(err) => write!(f, "\"Error: {}\"", err),
-                    LatchStatus::Unknown(x) => write!(f, "{:#04x}", x),
+                    LatchStatus::Error(err) => write!(f, "\"Error: {err}\""),
+                    LatchStatus::Unknown(x) => write!(f, "{x:#04x}"),
                 }?;
 
                 write!(f, " }}")
@@ -418,14 +418,14 @@ impl std::fmt::Display for PrettyEvent {
                     DeviceMode::Tablet     => write!(f, "Tablet"),
                     DeviceMode::Laptop     => write!(f, "Laptop"),
                     DeviceMode::Studio     => write!(f, "Studio"),
-                    DeviceMode::Unknown(x) => write!(f, "{:#04x}", x),
+                    DeviceMode::Unknown(x) => write!(f, "{x:#04x}"),
                 }?;
 
                 write!(f, " }}")
             },
 
             Event::Unknown { code, data } => {
-                write!(f, "Unknown        {{ Code: {:#04x}, Data: {:02x?} }}", code, data)
+                write!(f, "Unknown        {{ Code: {code:#04x}, Data: {data:02x?} }}")
             },
         }
     }

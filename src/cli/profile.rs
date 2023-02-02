@@ -51,7 +51,7 @@ impl Command {
             .context("Failed to get supported platform profiles")?;
 
         if !supported.iter().any(|p| p == profile) {
-            anyhow::bail!("Platform profile '{}' is not supported", profile);
+            anyhow::bail!("Platform profile '{profile}' is not supported");
         }
 
         let current_profile = dev.get()
@@ -62,11 +62,11 @@ impl Command {
                 .context("Failed to set platform profile")?;
 
             if !m.is_present("quiet") {
-                println!("Platform profile set to '{}'", profile);
+                println!("Platform profile set to '{profile}'");
             }
 
         } else if !m.is_present("quiet") {
-            println!("Platform profile already set to '{}', not changing", profile);
+            println!("Platform profile already set to '{profile}', not changing");
         }
 
         Ok(())
@@ -79,7 +79,7 @@ impl Command {
         let profile = dev.get()
             .context("Failed to get current platform profile")?;
 
-        println!("{}", profile);
+        println!("{profile}");
         Ok(())
     }
 
@@ -92,14 +92,14 @@ impl Command {
 
         if !m.is_present("quiet") {
             for profile in supported {
-                println!("{}", profile);
+                println!("{profile}");
             }
 
         } else {
             let text = serde_json::to_string(&supported)
                 .context("Failed to serialize data")?;
 
-            println!("{}", text);
+            println!("{text}");
         }
 
         Ok(())
