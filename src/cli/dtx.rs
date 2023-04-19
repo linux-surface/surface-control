@@ -73,7 +73,7 @@ impl Command {
             .latch_lock()
             .context("Failed to lock latch")?;
 
-        if !m.is_present("quiet") {
+        if !m.get_flag("quiet") {
             println!("Clipboard latch locked");
         }
 
@@ -86,7 +86,7 @@ impl Command {
             .latch_unlock()
             .context("Failed to unlock latch")?;
 
-        if !m.is_present("quiet") {
+        if !m.get_flag("quiet") {
             println!("Clipboard latch unlocked");
         }
 
@@ -99,7 +99,7 @@ impl Command {
             .latch_request()
             .context("Failed to send latch request")?;
 
-        if !m.is_present("quiet") {
+        if !m.get_flag("quiet") {
             println!("Clipboard latch request executed");
         }
 
@@ -112,7 +112,7 @@ impl Command {
             .latch_confirm()
             .context("Failed to send confirmation")?;
 
-        if !m.is_present("quiet") {
+        if !m.get_flag("quiet") {
             println!("Clipboard detachment confirmed");
         }
 
@@ -125,7 +125,7 @@ impl Command {
             .latch_heartbeat()
             .context("Failed to send heartbeat")?;
 
-        if !m.is_present("quiet") {
+        if !m.get_flag("quiet") {
             println!("Clipboard detachment heartbeat sent");
         }
 
@@ -138,7 +138,7 @@ impl Command {
             .latch_cancel()
             .context("Failed to cancel detachment")?;
 
-        if !m.is_present("quiet") {
+        if !m.get_flag("quiet") {
             println!("Clipboard detachment canceled");
         }
 
@@ -151,7 +151,7 @@ impl Command {
             .get_base_info()
             .context("Failed to get base info")?;
 
-        if !m.is_present("quiet") {
+        if !m.get_flag("quiet") {
             println!("State: {}", info.state);
             println!("Type:  {}", info.device_type);
             println!("ID:    {:#04x}", info.id);
@@ -193,7 +193,7 @@ impl Command {
         let events = device.events()
             .context("Failed to set up event stream")?;
 
-        let quiet = m.is_present("quiet");
+        let quiet = m.get_flag("quiet");
 
         for event in events {
             let event = event

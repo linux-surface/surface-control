@@ -1,10 +1,13 @@
 use std::convert::TryFrom;
 
-use crate::{cli::Command as DynCommand, sys};
+use crate::cli::Command as DynCommand;
 use crate::sys::pci::PciDevice;
+use crate::sys::Error;
+use crate::sys;
 
 use anyhow::{Context, Result};
-use sys::Error;
+use clap::ValueEnum;
+use clap::builder::PossibleValue;
 
 
 pub struct Command;
@@ -27,18 +30,18 @@ impl DynCommand for Command {
                 .about("Get the dGPU PCI device ID")
                 .display_order(1))
             .subcommand(clap::Command::new("get-power-state")
-                .aliases(&["ps", "get-ps", "power-state"])
+                .aliases(["ps", "get-ps", "power-state"])
                 .about("Get the dGPU PCI power state")
                 .display_order(2))
             .subcommand(clap::Command::new("get-runtime-pm")
-                .aliases(&["rpm", "get-rpm"])
+                .aliases(["rpm", "get-rpm"])
                 .about("Get the dGPU runtime PM control")
                 .display_order(3))
             .subcommand(clap::Command::new("set-runtime-pm")
                 .alias("set-rpm")
                 .about("Set the dGPU runtime PM control")
                 .arg(Arg::new("mode")
-                    .possible_values(["on", "off"])
+                    .value_parser(clap::value_parser!(sys::pci::RuntimePowerManagement))
                     .required(true)
                     .index(1))
                 .display_order(4))
@@ -67,7 +70,7 @@ impl Command {
         let device_id = dgpu.device_id()
             .context("Failed to get device ID")?;
 
-        if !m.is_present("quiet") {
+        if !m.get_flag("quiet") {
             println!("Vendor: {vendor_id:04x}");
             println!("Device: {device_id:04x}");
         } else {
@@ -104,7 +107,7 @@ impl Command {
     }
 
     fn set_runtime_pm(&self, m: &clap::ArgMatches) -> Result<()> {
-        let mode: sys::pci::RuntimePowerManagement = m.value_of_t_or_exit("mode");
+        let mode: sys::pci::RuntimePowerManagement = *m.get_one("mode").unwrap();
 
         let mut dgpu = find_dgpu_device()
             .context("Failed to look up discrete GPU device")?
@@ -113,7 +116,7 @@ impl Command {
         dgpu.set_runtime_pm(mode)
             .context("Failed to set runtime PM mode")?;
 
-        if !m.is_present("quiet") {
+        if !m.get_flag("quiet") {
             println!("Discrete GPU runtime PM set to '{mode}'");
         }
 
@@ -153,4 +156,17 @@ pub fn find_dgpu_device() -> crate::sys::Result<Option<PciDevice>> {
     }
 
     Ok(None)
+}
+
+impl ValueEnum for sys::pci::RuntimePowerManagement {
+    fn value_variants<'a>() -> &'a [Self] {
+        &[Self::On, Self::Off]
+    }
+
+    fn to_possible_value(&self) -> Option<clap::builder::PossibleValue> {
+        match self {
+            Self::On => Some(PossibleValue::new("on").help("Enable runtime power management")),
+            Self::Off => Some(PossibleValue::new("off").help("Disable runtime power management")),
+        }
+    }
 }

@@ -42,7 +42,7 @@ impl DynCommand for Command {
 
 impl Command {
     fn profile_set(&self, m: &clap::ArgMatches) -> Result<()> {
-        let profile = m.value_of("profile").unwrap();
+        let profile: &String = m.get_one("profile").unwrap();
 
         let dev = sys::profile::Device::open()
             .context("Failed to open platform profile device")?;
@@ -57,15 +57,15 @@ impl Command {
         let current_profile = dev.get()
             .context("Failed to get current platform profile")?;
 
-        if profile != current_profile {
+        if profile != &current_profile {
             dev.set(profile)
                 .context("Failed to set platform profile")?;
 
-            if !m.is_present("quiet") {
+            if !m.get_flag("quiet") {
                 println!("Platform profile set to '{profile}'");
             }
 
-        } else if !m.is_present("quiet") {
+        } else if !m.get_flag("quiet") {
             println!("Platform profile already set to '{profile}', not changing");
         }
 
@@ -90,7 +90,7 @@ impl Command {
         let supported = dev.get_supported()
             .context("Failed to get supported platform profiles")?;
 
-        if !m.is_present("quiet") {
+        if !m.get_flag("quiet") {
             for profile in supported {
                 println!("{profile}");
             }

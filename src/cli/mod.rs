@@ -45,6 +45,7 @@ impl Registry {
                 .help("Keep output quiet")
                 .short('q')
                 .long("quiet")
+                .action(clap::ArgAction::SetTrue)
                 .global(true));
 
         for cmd in self.commands.values() {
