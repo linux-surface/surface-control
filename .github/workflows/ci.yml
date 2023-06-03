@@ -116,7 +116,7 @@ jobs:
     - name: Sign package
       env:
         GPG_KEY_ID: 56C464BAAC421453
-        GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
+        GPG_KEY: ${{ secrets.LINUX_SURFACE_GPG_KEY }}
       run: |
         # import GPG key
         echo "$GPG_KEY" | base64 -d | gpg --import --no-tty --batch --yes
@@ -163,7 +163,7 @@ jobs:
     - name: Sign packages
       env:
         GPG_KEY_ID: 56C464BAAC421453
-        GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
+        GPG_KEY: ${{ secrets.LINUX_SURFACE_GPG_KEY }}
       run: |
         cd pkg/fedora/out/x86_64
 
@@ -208,7 +208,7 @@ jobs:
     - name: Sign packages
       env:
         GPG_KEY_ID: 56C464BAAC421453
-        GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
+        GPG_KEY: ${{ secrets.LINUX_SURFACE_GPG_KEY }}
       run: |
         cd pkg/fedora/out/x86_64
 
@@ -253,7 +253,7 @@ jobs:
     - name: Sign packages
       env:
         GPG_KEY_ID: 56C464BAAC421453
-        GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
+        GPG_KEY: ${{ secrets.LINUX_SURFACE_GPG_KEY }}
       run: |
         cd pkg/fedora/out/x86_64
 
@@ -335,7 +335,7 @@ jobs:
 
     - name: Update repository
       env:
-        SURFACEBOT_TOKEN: ${{ secrets.GITHUB_BOT_TOKEN }}
+        SURFACEBOT_TOKEN: ${{ secrets.LINUX_SURFACE_BOT_TOKEN }}
         BRANCH_STAGING: u/staging
         GIT_REF: ${{ github.ref }}
       run: |
@@ -388,7 +388,7 @@ jobs:
 
     - name: Update repository
       env:
-        SURFACEBOT_TOKEN: ${{ secrets.GITHUB_BOT_TOKEN }}
+        SURFACEBOT_TOKEN: ${{ secrets.LINUX_SURFACE_BOT_TOKEN }}
         BRANCH_STAGING: u/staging
         GIT_REF: ${{ github.ref }}
       run: |
@@ -441,7 +441,7 @@ jobs:
 
     - name: Update repository
       env:
-        SURFACEBOT_TOKEN: ${{ secrets.GITHUB_BOT_TOKEN }}
+        SURFACEBOT_TOKEN: ${{ secrets.LINUX_SURFACE_BOT_TOKEN }}
         BRANCH_STAGING: u/staging
         GIT_REF: ${{ github.ref }}
       run: |
@@ -494,7 +494,7 @@ jobs:
 
     - name: Update repository
       env:
-        SURFACEBOT_TOKEN: ${{ secrets.GITHUB_BOT_TOKEN }}
+        SURFACEBOT_TOKEN: ${{ secrets.LINUX_SURFACE_BOT_TOKEN }}
         BRANCH_STAGING: u/staging
         GIT_REF: ${{ github.ref }}
       run: |
