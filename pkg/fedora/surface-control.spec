@@ -30,8 +30,6 @@ strip --strip-all "target/release/surface"
 %install
 rm -rf %{buildroot}
 install -D -m755 "surface-control/target/release/surface" "%{buildroot}/usr/bin/surface"
-install -D -m644 "surface-control/etc/sysusers/surface-control.conf" "%{buildroot}%{_sysusersdir}/%{name}.conf"
-install -D -m644 "surface-control/etc/udev/40-surface-control.rules" "%{buildroot}%{_udevrulesdir}/40-surface-control.rules"
 install -D -m644 "surface-control/target/surface.bash" "%{buildroot}/usr/share/bash-completion/completions/surface"
 install -D -m644 "surface-control/target/_surface" "%{buildroot}/usr/share/zsh/site-functions/_surface"
 install -D -m644 "surface-control/target/surface.fish" "%{buildroot}/usr/share/fish/completions/surface.fish"
@@ -42,8 +40,6 @@ install -D -m644 "surface-control/target/surface.fish" "%{buildroot}/usr/share/f
 %files
 %license surface-control/LICENSE
 /usr/bin/surface
-%{_sysusersdir}/%{name}.conf
-%{_udevrulesdir}/40-surface-control.rules
 /usr/share/bash-completion/completions/surface
 /usr/share/zsh/site-functions/_surface
 /usr/share/fish/completions/surface.fish

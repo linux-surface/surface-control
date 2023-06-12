@@ -15,10 +15,6 @@ override_dh_install:
 	# binary files
 	install -D -m755 "target/release/surface" "${pkgdir}/usr/bin/surface"
 
-	# copy system files
-	install -D -m644 "etc/sysusers/surface-control.conf" "${pkgdir}/usr/lib/sysusers.d/surface-control.conf"
-	install -D -m644 "etc/udev/40-surface-control.rules" "${pkgdir}/lib/udev/rules.d/40-surface-control.rules"
-
 	# completion files
 	install -D -m644 "target/surface.bash" "${pkgdir}/usr/share/bash-completion/completions/surface"
 	install -D -m644 "target/_surface" "${pkgdir}/usr/share/zsh/vendor-completions/_surface"

@@ -37,11 +37,6 @@ For this tool to work, you need a recent version of the [surface-sam module][sur
 Have a look at the [releases](https://github.com/linux-surface/surface-control/releases) page.
 Pre-built packages are available for Debian (Ubuntu, ...), whereas PKGBUILDs for Arch Linux are in the AUR (`surface-control`).
 
-_Hint_: Add the following udev rule to change performance mode as a normal user
-```
-KERNEL=="01:03:01:00:01", SUBSYSTEM=="surface_aggregator", RUN+="/usr/bin/chmod 666 /sys/bus/surface_aggregator/devices/01:03:01:00:01/perf_mode"
-```
-
 ## Building from Source
 
 Building this application from source follows the standard rust procedure, i.e. simply call `cargo build --release --locked` for a release-ready executable.

@@ -1,2 +1,0 @@
-KERNEL=="01:03:01:00:01", SUBSYSTEM=="surface_aggregator", RUN+="/usr/bin/chmod 664 /sys/bus/surface_aggregator/devices/01:03:01:00:01/perf_mode"
-KERNEL=="01:03:01:00:01", SUBSYSTEM=="surface_aggregator", RUN+="/usr/bin/chown root:surface-control /sys/bus/surface_aggregator/devices/01:03:01:00:01/perf_mode"
