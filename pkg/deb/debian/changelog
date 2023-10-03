@@ -1,3 +1,9 @@
+surface-control (0.4.6-1) unstable; urgency=medium
+
+  * Remove outdated udev rules.
+
+ -- Maximilian Luz <luzmaximilian@gmail.com>  Tue, 03 Oct 2023 15:43:21 +0200
+
 surface-control (0.4.5-1) unstable; urgency=medium
 
   * Remove outdated udev rules. 
