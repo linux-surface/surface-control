@@ -1,6 +1,12 @@
+surface-control (0.4.6-2) unstable; urgency=medium
+
+  * Bump release for Fedora 39 build
+
+ -- Maximilian Luz <luzmaximilian@gmail.com>  Tue, 03 Oct 2023 16:37:05 +0200
+
 surface-control (0.4.6-1) unstable; urgency=medium
 
-  * Remove outdated udev rules.
+  * Update dependencies
 
  -- Maximilian Luz <luzmaximilian@gmail.com>  Tue, 03 Oct 2023 15:43:21 +0200
 
