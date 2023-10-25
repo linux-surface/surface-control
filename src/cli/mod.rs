@@ -48,7 +48,10 @@ impl Registry {
                 .action(clap::ArgAction::SetTrue)
                 .global(true));
 
-        for cmd in self.commands.values() {
+        let mut cmds: Vec<_> = self.commands.values().collect();
+        cmds.sort_by_key(|c| c.name());
+
+        for cmd in cmds {
             app = app.subcommand(cmd.build());
         }
 
