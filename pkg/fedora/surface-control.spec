@@ -32,7 +32,7 @@ rm -rf %{buildroot}
 install -D -m755 "surface-control/target/release/surface" "%{buildroot}/usr/bin/surface"
 install -D -m644 "surface-control/target/surface.bash" "%{buildroot}/usr/share/bash-completion/completions/surface"
 install -D -m644 "surface-control/target/_surface" "%{buildroot}/usr/share/zsh/site-functions/_surface"
-install -D -m644 "surface-control/target/surface.fish" "%{buildroot}/usr/share/fish/completions/surface.fish"
+install -D -m644 "surface-control/target/surface.fish" "%{buildroot}/usr/share/fish/vendor_completions.d/surface.fish"
 
 %pre
 %sysusers_create_package %{name} "surface-control/etc/sysusers/surface-control.conf"

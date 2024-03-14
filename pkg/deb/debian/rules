@@ -18,7 +18,7 @@ override_dh_install:
 	# completion files
 	install -D -m644 "target/surface.bash" "${pkgdir}/usr/share/bash-completion/completions/surface"
 	install -D -m644 "target/_surface" "${pkgdir}/usr/share/zsh/vendor-completions/_surface"
-	install -D -m644 "target/surface.fish" "${pkgdir}/usr/share/fish/completions/surface.fish"
+	install -D -m644 "target/surface.fish" "${pkgdir}/usr/share/fish/vendor_completions.d/surface.fish"
 
 %:
 	dh $@
