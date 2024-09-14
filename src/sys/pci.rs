@@ -21,6 +21,7 @@ pub const BASE_CLASS_DISPLAY: u8 = 0x03;
 
 
 #[derive(Debug, Clone, Copy)]
+#[allow(unused)]
 pub struct Class {
     pub base:  u8,
     pub sub:   u8,
