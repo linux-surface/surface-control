@@ -81,10 +81,7 @@ for file in $FILES; do
 	[ "$file" = "$DIR/$BUILD" ] && continue
 	[ "$file" = "$DIR/$RPMS" ] && continue
 
-	# this three-step process is required to properly handle symlinks to source root
-	mkdir -p "/tmp/makerpm/$(dirname "$file")"
-	cp -rH "$file" "/tmp/makerpm/$file"
-	mv "/tmp/makerpm/$file" "$DIR/$BUILD"
+	cp -r "$file" "$DIR/$BUILD"
 done
 
 spectool                                   \
@@ -118,4 +115,3 @@ for file in $(find out/ -name '*.rpm'); do
 		rpm --resign $file --define "_gpg_name $KEY" 2>&1 > /dev/null
 	fi
 done
-

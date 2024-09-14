@@ -19,8 +19,6 @@ devices.
 %prep
 
 %build
-cd surface-control
-
 export CARGO_TARGET_DIR="$PWD/target"
 export CARGO_INCREMENTAL=0
 
@@ -29,16 +27,12 @@ strip --strip-all "target/release/surface"
 
 %install
 rm -rf %{buildroot}
-install -D -m755 "surface-control/target/release/surface" "%{buildroot}/usr/bin/surface"
-install -D -m644 "surface-control/target/surface.bash" "%{buildroot}/usr/share/bash-completion/completions/surface"
-install -D -m644 "surface-control/target/_surface" "%{buildroot}/usr/share/zsh/site-functions/_surface"
-install -D -m644 "surface-control/target/surface.fish" "%{buildroot}/usr/share/fish/vendor_completions.d/surface.fish"
-
-%pre
-%sysusers_create_package %{name} "surface-control/etc/sysusers/surface-control.conf"
+install -D -m755 "target/release/surface" "%{buildroot}/usr/bin/surface"
+install -D -m644 "target/surface.bash" "%{buildroot}/usr/share/bash-completion/completions/surface"
+install -D -m644 "target/_surface" "%{buildroot}/usr/share/zsh/site-functions/_surface"
+install -D -m644 "target/surface.fish" "%{buildroot}/usr/share/fish/vendor_completions.d/surface.fish"
 
 %files
-%license surface-control/LICENSE
 /usr/bin/surface
 /usr/share/bash-completion/completions/surface
 /usr/share/zsh/site-functions/_surface
