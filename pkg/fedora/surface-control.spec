@@ -1,6 +1,6 @@
 Name:       surface-control
-Version:    0.4.6
-Release:    3%{?dist}
+Version:    0.4.7
+Release:    1%{?dist}
 Summary:    Control various aspects of Microsoft Surface devices from the shell
 
 License:    MIT
@@ -36,9 +36,12 @@ install -D -m644 "target/surface.fish" "%{buildroot}/usr/share/fish/vendor_compl
 /usr/bin/surface
 /usr/share/bash-completion/completions/surface
 /usr/share/zsh/site-functions/_surface
-/usr/share/fish/completions/surface.fish
+/usr/share/fish/vendor_completions.d/surface.fish
 
 %changelog
+* Sat Sep 14 2024 Maximilian Luz <luzmaximilian@gmail.com> - 0.4.7-1
+- Update dependencies
+
 * Thu Mar 14 2024 Maximilian Luz <luzmaximilian@gmail.com> - 0.4.6-3
 - Update dependencies
 
