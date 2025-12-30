@@ -1,3 +1,9 @@
+surface-control (0.4.10-1) unstable; urgency=medium
+
+  * Update dependencies
+
+ -- Maximilian Luz <luzmaximilian@gmail.com>  Tue, 30 Dec 2025 02:37:00 +0200
+
 surface-control (0.4.9-1) unstable; urgency=medium
 
   * Update dependencies
