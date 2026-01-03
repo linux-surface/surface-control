@@ -28,6 +28,8 @@ impl DynCommand for Command {
                 .about("Get the current platform profile"))
             .subcommand(clap::Command::new("list")
                 .about("List all available platform profiles"))
+            .subcommand(clap::Command::new("cycle")
+                .about("Cycle to the next platform profile"))
     }
 
     fn execute(&self, m: &clap::ArgMatches) -> Result<()> {
@@ -35,6 +37,7 @@ impl DynCommand for Command {
             Some(("set",  m))  => self.profile_set(m),
             Some(("get",  m))  => self.profile_get(m),
             Some(("list", m)) => self.profile_list(m),
+            Some(("cycle", m)) => self.profile_cycle(m),
             _                => unreachable!(),
         }
     }
@@ -100,6 +103,37 @@ impl Command {
                 .context("Failed to serialize data")?;
 
             println!("{text}");
+        }
+
+        Ok(())
+    }
+
+    fn profile_cycle(&self, m: &clap::ArgMatches) -> Result<()> {
+        let dev = sys::profile::Device::open()
+            .context("Failed to open platform profile device")?;
+
+        let supported = dev.get_supported()
+            .context("Failed to get supported platform profiles")?;
+
+        if supported.is_empty() {
+            anyhow::bail!("No platform profiles available");
+        }
+
+        let current_profile = dev.get()
+            .context("Failed to get current platform profile")?;
+
+        // Find the next profile in the list, wrapping around to the start
+        let next_profile = supported.iter()
+            .cycle()
+            .skip_while(|&p| p != &current_profile)
+            .nth(1)
+            .unwrap_or(&supported[0]);
+
+        dev.set(next_profile)
+            .context("Failed to set platform profile")?;
+
+        if !m.get_flag("quiet") {
+            println!("Platform profile cycled from '{current_profile}' to '{next_profile}'");
         }
 
         Ok(())
