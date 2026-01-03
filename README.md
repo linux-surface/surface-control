@@ -26,7 +26,7 @@ SUBCOMMANDS:
 
 See `surface <subcommand> help` for more details.
 
-_Hint:_ You can specify the subcommand by any unabiguous prefix of it, i.e. `surface perf` and `surface p` will both evaluate to `surface performance`.
+_Hint:_ You can specify the subcommand by any unabiguous prefix of it, i.e. `surface prof` and `surface p` will both evaluate to `surface profile`.
 
 ## Prequisites
 
