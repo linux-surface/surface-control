@@ -28,17 +28,20 @@ impl DynCommand for Command {
                 .about("Get the current platform profile"))
             .subcommand(clap::Command::new("list")
                 .about("List all available platform profiles"))
-            .subcommand(clap::Command::new("cycle")
+            .subcommand(clap::Command::new("next")
                 .about("Cycle to the next platform profile"))
+            .subcommand(clap::Command::new("prev")
+                .about("Cycle to the previous platform profile"))
     }
 
     fn execute(&self, m: &clap::ArgMatches) -> Result<()> {
         match m.subcommand() {
-            Some(("set",  m))  => self.profile_set(m),
-            Some(("get",  m))  => self.profile_get(m),
+            Some(("set",  m)) => self.profile_set(m),
+            Some(("get",  m)) => self.profile_get(m),
             Some(("list", m)) => self.profile_list(m),
-            Some(("cycle", m)) => self.profile_cycle(m),
-            _                => unreachable!(),
+            Some(("next", m)) => self.profile_cycle_next(m),
+            Some(("prev", m)) => self.profile_cycle_prev(m),
+            _                 => unreachable!(),
         }
     }
 }
@@ -108,7 +111,7 @@ impl Command {
         Ok(())
     }
 
-    fn profile_cycle(&self, m: &clap::ArgMatches) -> Result<()> {
+    fn profile_cycle_next(&self, m: &clap::ArgMatches) -> Result<()> {
         let dev = sys::profile::Device::open()
             .context("Failed to open platform profile device")?;
 
@@ -123,17 +126,50 @@ impl Command {
             .context("Failed to get current platform profile")?;
 
         // Find the next profile in the list, wrapping around to the start
-        let next_profile = supported.iter()
-            .cycle()
-            .skip_while(|&p| p != &current_profile)
-            .nth(1)
-            .unwrap_or(&supported[0]);
+        let current_index = supported.iter()
+            .position(|p| p == &current_profile)
+            .unwrap_or(0);
+
+        let next_index = (current_index + 1) % supported.len();
+        let next_profile = &supported[next_index];
 
         dev.set(next_profile)
             .context("Failed to set platform profile")?;
 
         if !m.get_flag("quiet") {
             println!("Platform profile cycled from '{current_profile}' to '{next_profile}'");
+        }
+
+        Ok(())
+    }
+
+    fn profile_cycle_prev(&self, m: &clap::ArgMatches) -> Result<()> {
+        let dev = sys::profile::Device::open()
+            .context("Failed to open platform profile device")?;
+
+        let supported = dev.get_supported()
+            .context("Failed to get supported platform profiles")?;
+
+        if supported.is_empty() {
+            anyhow::bail!("No platform profiles available");
+        }
+
+        let current_profile = dev.get()
+            .context("Failed to get current platform profile")?;
+
+        // Find the previous profile in the list, wrapping around to the end
+        let current_index = supported.iter()
+            .position(|p| p == &current_profile)
+            .unwrap_or(0);
+
+        let prev_index = (current_index + supported.len() - 1) % supported.len();
+        let prev_profile = &supported[prev_index];
+
+        dev.set(prev_profile)
+            .context("Failed to set platform profile")?;
+
+        if !m.get_flag("quiet") {
+            println!("Platform profile cycled from '{current_profile}' to '{prev_profile}'");
         }
 
         Ok(())
