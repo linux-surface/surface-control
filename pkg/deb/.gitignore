@@ -3,3 +3,4 @@ src/
 *.buildinfo
 *.changes
 *.deb
+*.ddeb

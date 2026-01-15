@@ -20,5 +20,13 @@ override_dh_install:
 	install -D -m644 "target/_surface" "${pkgdir}/usr/share/zsh/vendor-completions/_surface"
 	install -D -m644 "target/surface.fish" "${pkgdir}/usr/share/fish/vendor_completions.d/surface.fish"
 
+	# service files
+	install -D -m644 "systemd/surface-rapl.service" "${pkgdir}/usr/lib/systemd/system/surface-rapl.service"
+	install -D -m744 "systemd/surface-rapl.sh" "${pkgdir}/usr/libexec/surface-rapl.sh"
+	mkdir -p "${pkgdir}/usr/lib/systemd/system/multi-user.target.wants"
+	ln -sT "../surface-rapl.service" "${pkgdir}/usr/lib/systemd/system/multi-user.target.wants/surface-rapl.service"
+	mkdir -p "${pkgdir}/usr/lib/systemd/system/suspend.target.wants"
+	ln -sT "../surface-rapl.service" "${pkgdir}/usr/lib/systemd/system/suspend.target.wants/surface-rapl.service"
+
 %:
 	dh $@
