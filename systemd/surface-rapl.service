@@ -1,0 +1,11 @@
+[Unit]
+Description=Undoes firmware throttling processor after low-battery boot/resume
+After=suspend.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/surface-rapl.sh
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=suspend.target
